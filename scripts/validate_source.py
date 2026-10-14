@@ -1,0 +1,373 @@
+from pathlib import Path
+import re
+
+root = Path(__file__).resolve().parents[1]
+
+required = [
+    "VERSION",
+    "settings.gradle.kts",
+    "build.gradle.kts",
+    "app/build.gradle.kts",
+    "app/src/main/AndroidManifest.xml",
+    "app/src/main/java/com/listamercado/app/model/ShoppingList.kt",
+    "app/src/main/java/com/listamercado/app/model/CatalogProduct.kt",
+    "app/src/main/java/com/listamercado/app/util/PriceTargetHelper.kt",
+    "app/src/main/java/com/listamercado/app/model/BarcodeLookupResult.kt",
+    "app/src/main/java/com/listamercado/app/model/ListTemplate.kt",
+    "app/src/main/java/com/listamercado/app/model/Recurrence.kt",
+    "app/src/main/java/com/listamercado/app/model/NearbyMarket.kt",
+    "app/src/main/java/com/listamercado/app/data/ProductCatalogRepository.kt",
+    "app/src/main/java/com/listamercado/app/data/BarcodeLookupRepository.kt",
+    "app/src/main/java/com/listamercado/app/data/TemplateRepository.kt",
+    "app/src/main/java/com/listamercado/app/data/MarketPreferencesRepository.kt",
+    "app/src/main/java/com/listamercado/app/ui/ListDetailActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/PurchaseModeActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/PurchaseModeAdapter.kt",
+    "app/src/main/java/com/listamercado/app/ui/CatalogActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/CatalogProductAdapter.kt",
+    "app/src/main/java/com/listamercado/app/ui/PriceTargetDialog.kt",
+    "app/src/main/java/com/listamercado/app/ui/BarcodeScannerActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/TemplatesActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/TemplateAdapter.kt",
+    "app/src/main/java/com/listamercado/app/ui/RecurringProductsActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/RecurringProductAdapter.kt",
+    "app/src/main/java/com/listamercado/app/ui/NearbyMarketAdapter.kt",
+    "app/src/main/res/layout/activity_purchase_mode.xml",
+    "app/src/main/res/layout/item_purchase_mode.xml",
+    "app/src/main/res/layout/activity_catalog.xml",
+    "app/src/main/res/layout/item_catalog_product.xml",
+    "app/src/main/res/layout/dialog_price_target.xml",
+    "app/src/main/res/layout/activity_barcode_scanner.xml",
+    "app/src/main/res/layout/activity_templates.xml",
+    "app/src/main/res/layout/item_list_template.xml",
+    "app/src/main/res/layout/activity_recurring_products.xml",
+    "app/src/main/res/layout/item_recurring_product.xml",
+    "app/src/main/res/layout/item_nearby_market.xml",
+    "app/src/main/java/com/listamercado/app/ui/SettingsActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/CompareActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/NearbyMarketsActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/WhatsNewActivity.kt",
+    "app/src/main/java/com/listamercado/app/ui/WhatsNewContent.kt",
+    "app/src/main/java/com/listamercado/app/ui/BudgetDialog.kt",
+    "app/src/main/java/com/listamercado/app/util/PriceUnitHelper.kt",
+    "app/src/main/res/layout/dialog_budget.xml",
+    "app/src/main/assets/nearby_markets_map.html",
+    "app_identity.json",
+    "github-manager.json",
+    "scripts/validate_workflow.py",
+    ".github/workflows/android-release.yml",
+]
+missing = [path for path in required if not (root / path).is_file()]
+if missing:
+    raise SystemExit("Missing required native Android files: " + ", ".join(missing))
+
+app_gradle = (root / "app/build.gradle.kts").read_text(encoding="utf-8")
+root_gradle = (root / "build.gradle.kts").read_text(encoding="utf-8")
+
+checks = [
+    ('id("com.android.application")' in app_gradle, "Android application plugin"),
+    ('id("org.jetbrains.kotlin.android")' in app_gradle, "Kotlin Android plugin"),
+    ("compileSdk = 35" in app_gradle, "compileSdk 35"),
+    ("targetSdk = 35" in app_gradle, "targetSdk 35"),
+    ("minSdk = 26" in app_gradle, "minSdk 26"),
+    ('version "8.7.3"' in root_gradle, "Android Gradle Plugin 8.7.3"),
+    ('version "2.0.21"' in root_gradle, "Kotlin 2.0.21"),
+]
+failed = [label for ok, label in checks if not ok]
+if failed:
+    raise SystemExit("Native Android source validation failed: " + ", ".join(failed))
+
+# BuildConfig is disabled by default in modern AGP configurations unless explicitly enabled.
+kotlin_sources = "\n".join(p.read_text(encoding="utf-8") for p in root.rglob("*.kt"))
+if "BuildConfig" in kotlin_sources and not re.search(
+    r"buildFeatures\s*\{[^}]*buildConfig\s*=\s*true", app_gradle, re.S
+):
+    raise SystemExit(
+        "Kotlin source references BuildConfig, but app/build.gradle.kts does not enable "
+        "android.buildFeatures.buildConfig = true"
+    )
+
+# This project is Kotlin/XML. A Flutter workflow was accidentally committed previously.
+flutter_markers = ["flutter pub get", "flutter analyze", "flutter test", "flutter build apk"]
+workflow_dir = root / ".github/workflows"
+for workflow in workflow_dir.glob("*.yml"):
+    content = workflow.read_text(encoding="utf-8").lower()
+    bad = [marker for marker in flutter_markers if marker in content]
+    if bad:
+        raise SystemExit(
+            f"{workflow.relative_to(root)} contains Flutter commands in a native Kotlin project: "
+            + ", ".join(bad)
+        )
+
+manifest = (root / "app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
+for permission in (
+    "android.permission.INTERNET",
+    "android.permission.ACCESS_COARSE_LOCATION",
+    "android.permission.ACCESS_FINE_LOCATION",
+):
+    if permission not in manifest:
+        raise SystemExit(f"Missing map permission in AndroidManifest.xml: {permission}")
+
+if "android.permission.CAMERA" not in manifest:
+    raise SystemExit("Missing CAMERA permission for local barcode scanning")
+if "android.permission.VIBRATE" not in manifest:
+    raise SystemExit("Missing VIBRATE permission for safe barcode-scan feedback")
+
+map_source = (root / "app/src/main/java/com/listamercado/app/ui/NearbyMarketsActivity.kt").read_text(encoding="utf-8")
+market_repo_source = (root / "app/src/main/java/com/listamercado/app/data/MarketPreferencesRepository.kt").read_text(encoding="utf-8")
+market_layout = (root / "app/src/main/res/layout/activity_nearby_markets.xml").read_text(encoding="utf-8")
+market_item_layout = (root / "app/src/main/res/layout/item_nearby_market.xml").read_text(encoding="utf-8")
+map_html = (root / "app/src/main/assets/nearby_markets_map.html").read_text(encoding="utf-8")
+if "overpass-api.de" not in map_source or 'shop"="supermarket' not in map_source:
+    raise SystemExit("Nearby supermarket map/Overpass query is missing or incomplete")
+for radius in ("5_000", "10_000", "20_000", "30_000", "50_000"):
+    if radius not in map_source:
+        raise SystemExit(f"Manual/adaptive market radius missing: {radius}")
+if "toggleFavorite" not in map_source or "favoriteKeys" not in market_repo_source or "★ favoritos primeiro" not in market_layout:
+    raise SystemExit("Favorite-market persistence/sorting UI is missing")
+if "saveCache" not in market_repo_source or "loadCache" not in market_repo_source or "cache recente" not in map_source:
+    raise SystemExit("Recent-market cache/fallback is missing")
+
+settings_source = (root / "app/src/main/java/com/listamercado/app/data/SettingsRepository.kt").read_text(encoding="utf-8")
+main_source = (root / "app/src/main/java/com/listamercado/app/ui/MainActivity.kt").read_text(encoding="utf-8")
+if "lastSeenWhatsNewVersionCode" not in settings_source or "WhatsNewActivity" not in main_source:
+    raise SystemExit("Per-version What's New flow is missing")
+
+whats_activity = (root / "app/src/main/java/com/listamercado/app/ui/WhatsNewActivity.kt").read_text(encoding="utf-8")
+if "savedInstanceState == null" not in main_source:
+    raise SystemExit("What's New launch must be guarded against MainActivity recreation")
+if "FLAG_ACTIVITY_SINGLE_TOP" not in main_source or "FLAG_ACTIVITY_CLEAR_TOP" not in main_source:
+    raise SystemExit("What's New launch flags for duplicate-instance prevention are missing")
+if "markWhatsNewSeen(BuildConfig.VERSION_CODE)" not in whats_activity or "acknowledgeAndClose" not in whats_activity:
+    raise SystemExit("What's New must be marked seen only when the user acknowledges it")
+if ".commit()" not in settings_source:
+    raise SystemExit("What's New acknowledgement must be synchronously persisted with commit()")
+if 'android:launchMode="singleTop"' not in manifest:
+    raise SystemExit("WhatsNewActivity must use singleTop to prevent duplicate instances")
+
+current_version = (root / "VERSION").read_text(encoding="utf-8").strip()
+changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
+if f"## {current_version}" not in changelog:
+    raise SystemExit(f"CHANGELOG.md does not contain the current version {current_version}")
+
+whats_new_source = (root / "app/src/main/java/com/listamercado/app/ui/WhatsNewContent.kt").read_text(encoding="utf-8")
+current_code = int(current_version.split("+")[1])
+match = re.search(r"CONTENT_VERSION_CODE\s*=\s*(\d+)", whats_new_source)
+if not match or int(match.group(1)) != current_code:
+    raise SystemExit(
+        f"WhatsNewContent.kt must be updated for versionCode {current_code}; "
+        "set CONTENT_VERSION_CODE to the current version and refresh the change list"
+    )
+
+
+list_model = (root / "app/src/main/java/com/listamercado/app/model/ShoppingList.kt").read_text(encoding="utf-8")
+repo_source = (root / "app/src/main/java/com/listamercado/app/data/ShoppingRepository.kt").read_text(encoding="utf-8")
+compare_source = (root / "app/src/main/java/com/listamercado/app/ui/CompareActivity.kt").read_text(encoding="utf-8")
+if "var budget: Double" not in list_model or 'put("budget", budget)' not in repo_source:
+    raise SystemExit("Per-list budget feature is missing or not persisted")
+if "var marketKey: String?" not in list_model or 'put("marketKey", marketKey' not in repo_source:
+    raise SystemExit("Market-to-list association is missing or not persisted")
+if "buildPriceInsight" not in compare_source or "Média:" not in compare_source or "Histórico de preço" not in kotlin_sources:
+    raise SystemExit("Smart product price history is missing")
+
+colors = (root / "app/src/main/res/values/colors.xml").read_text(encoding="utf-8")
+night_colors = (root / "app/src/main/res/values-night/colors.xml").read_text(encoding="utf-8")
+if "#2E6B47" in colors or "#2E6B47" in night_colors or 'color name="on_primary"' not in colors:
+    raise SystemExit("Updated violet theme / explicit on-primary contrast is missing")
+
+if "#111F2B" not in night_colors or "#142330" not in night_colors:
+    raise SystemExit("Updated graphite-blue dark surfaces are missing")
+
+# Android resources in qualified folders (such as values-night) must have default declarations.
+# Missing defaults fail lintVitalRelease and can crash when queried in another configuration.
+base_color_names = set(re.findall(r'<color\s+name="([^"]+)"', colors))
+night_color_names = set(re.findall(r'<color\s+name="([^"]+)"', night_colors))
+missing_default_colors = sorted(night_color_names - base_color_names)
+if missing_default_colors:
+    raise SystemExit(
+        "values-night/colors.xml contains colors without base declarations in values/colors.xml: "
+        + ", ".join(missing_default_colors)
+    )
+
+if "KEY_CICLOVIAGEM_PRICES_V1" not in repo_source or '"arroz branco" to ("kg" to 18.0 / 5.0)' not in repo_source:
+    raise SystemExit("Cicloviagem reference-price migration is missing")
+
+price_helper = (root / "app/src/main/java/com/listamercado/app/util/PriceUnitHelper.kt").read_text(encoding="utf-8")
+if '"g", "mL" -> internalPrice * 1000.0' not in price_helper:
+    raise SystemExit("Readable kg/L price normalization is missing")
+
+
+purchase_mode_source = (root / "app/src/main/java/com/listamercado/app/ui/PurchaseModeActivity.kt").read_text(encoding="utf-8")
+purchase_adapter_source = (root / "app/src/main/java/com/listamercado/app/ui/PurchaseModeAdapter.kt").read_text(encoding="utf-8")
+detail_source = (root / "app/src/main/java/com/listamercado/app/ui/ListDetailActivity.kt").read_text(encoding="utf-8")
+if "PurchaseModeActivity" not in manifest or "buttonPurchaseMode" not in detail_source:
+    raise SystemExit("Purchase mode entry point is missing")
+if "filter { !it.purchased }" not in purchase_mode_source or 'setAction("Desfazer")' not in purchase_mode_source:
+    raise SystemExit("Purchase mode must focus pending items and support undo")
+if "totalPrice / actualQuantity" not in purchase_mode_source or "inputQuickPrice" not in purchase_adapter_source:
+    raise SystemExit("Quick total-price editing is missing or does not use the actual purchased quantity")
+
+catalog_source = (root / "app/src/main/java/com/listamercado/app/data/ProductCatalogRepository.kt").read_text(encoding="utf-8")
+barcode_lookup_source = (root / "app/src/main/java/com/listamercado/app/data/BarcodeLookupRepository.kt").read_text(encoding="utf-8")
+barcode_lookup_model = (root / "app/src/main/java/com/listamercado/app/model/BarcodeLookupResult.kt").read_text(encoding="utf-8")
+item_dialog_source = (root / "app/src/main/java/com/listamercado/app/ui/ItemDialog.kt").read_text(encoding="utf-8")
+scanner_source = (root / "app/src/main/java/com/listamercado/app/ui/BarcodeScannerActivity.kt").read_text(encoding="utf-8")
+settings_activity_source = (root / "app/src/main/java/com/listamercado/app/ui/SettingsActivity.kt").read_text(encoding="utf-8")
+settings_layout = (root / "app/src/main/res/layout/activity_settings.xml").read_text(encoding="utf-8")
+if "normalizeName" not in catalog_source or "Normalizer.normalize" not in catalog_source or "catalog_products_v1" not in catalog_source:
+    raise SystemExit("Normalized local product catalog persistence is missing")
+if "seedFromLists" not in catalog_source or "lastUnitPrice" not in catalog_source or "barcode" not in catalog_source:
+    raise SystemExit("Catalog must seed existing items and persist last price/barcode")
+if "MaterialAutoCompleteTextView" not in item_dialog_source or "findByBarcode" not in item_dialog_source or "buttonScanBarcode" not in item_dialog_source:
+    raise SystemExit("Known-product suggestions or barcode fill flow is missing from item editor")
+if "lookupBarcodeOnline" not in item_dialog_source or "BarcodeLookupRepository" not in item_dialog_source:
+    raise SystemExit("Automatic optional online barcode lookup is missing from item editor")
+if "Open Food Facts" not in barcode_lookup_source or "product_name" not in barcode_lookup_source or "BarcodeLookupResult" not in barcode_lookup_model:
+    raise SystemExit("Online barcode lookup mapping is incomplete")
+if "BarcodeScanning.getClient" not in scanner_source or "InputImage.fromMediaImage" not in scanner_source:
+    raise SystemExit("On-device barcode scanner implementation is missing")
+if "buttonTorch" not in scanner_source or "chooseBestBarcode" not in scanner_source or "lastCandidateHits" not in scanner_source:
+    raise SystemExit("Scanner quality-of-life improvements (torch/selection/stability) are missing")
+if "vibrateSuccessSafely" not in scanner_source or "REQUIRED_STABLE_FRAMES = 3" not in scanner_source:
+    raise SystemExit("Scanner must use non-fatal haptics and three-frame confirmation")
+if "hasValidGtinChecksum" not in scanner_source or "clearAnalyzer" not in scanner_source:
+    raise SystemExit("Scanner GTIN validation / analyzer shutdown protection is missing")
+if "EXTRA_ERROR" not in scanner_source or "A câmera voltou sem um código confirmado" not in detail_source:
+    raise SystemExit("Scanner return-path error feedback is missing")
+if "recoverBarcodeResult" not in detail_source or "STATE_BARCODE_TARGET" not in detail_source or "onSaveInstanceState" not in detail_source:
+    raise SystemExit("Barcode result must survive ListDetailActivity recreation")
+if "initialBarcode" not in item_dialog_source or "handleBarcode" not in item_dialog_source:
+    raise SystemExit("Item editor cannot restore/apply a recovered barcode result")
+if "Código $code • novo produto" not in item_dialog_source:
+    raise SystemExit("Item editor must visibly show the scanned code even when product lookup has no match")
+if 'implementation("com.google.mlkit:barcode-scanning:17.3.0")' not in app_gradle:
+    raise SystemExit("Bundled ML Kit barcode-scanning dependency is missing")
+if "play-services-mlkit-barcode-scanning" in app_gradle:
+    raise SystemExit("Barcode scanning must not depend on the dynamically downloaded Play Services model")
+for camera_dep in (
+    'implementation("androidx.camera:camera-camera2:1.5.3")',
+    'implementation("androidx.camera:camera-lifecycle:1.5.3")',
+    'implementation("androidx.camera:camera-view:1.5.3")',
+):
+    if camera_dep not in app_gradle:
+        raise SystemExit(f"CameraX dependency missing: {camera_dep}")
+if re.search(r'androidx\.camera:camera-[^:\"]+:1\.6\.', app_gradle):
+    raise SystemExit(
+        "CameraX 1.6.x is incompatible with this project's compileSdk 35 / AGP 8.7.3 baseline; "
+        "keep the scanner on the validated 1.5.3 line unless the Android toolchain is upgraded together"
+    )
+if "CatalogActivity" not in manifest or "BarcodeScannerActivity" not in manifest:
+    raise SystemExit("Catalog/scanner activities are missing from AndroidManifest.xml")
+if "rowCatalog" not in settings_layout or "CatalogActivity::class.java" not in settings_activity_source:
+    raise SystemExit("Catalog entry point is missing from Settings")
+
+template_source = (root / "app/src/main/java/com/listamercado/app/data/TemplateRepository.kt").read_text(encoding="utf-8")
+templates_activity = (root / "app/src/main/java/com/listamercado/app/ui/TemplatesActivity.kt").read_text(encoding="utf-8")
+recurring_activity = (root / "app/src/main/java/com/listamercado/app/ui/RecurringProductsActivity.kt").read_text(encoding="utf-8")
+catalog_model = (root / "app/src/main/java/com/listamercado/app/model/CatalogProduct.kt").read_text(encoding="utf-8")
+catalog_activity = (root / "app/src/main/java/com/listamercado/app/ui/CatalogActivity.kt").read_text(encoding="utf-8")
+list_actions_source = (root / "app/src/main/java/com/listamercado/app/ui/ListActionsDialog.kt").read_text(encoding="utf-8")
+if "var favorite: Boolean" not in catalog_model or "var recurringFrequency: String?" not in catalog_model:
+    raise SystemExit("Catalog favorite/recurrence fields are missing")
+if "setFavorite" not in catalog_source or "setRecurringFrequency" not in catalog_source or "recurringProducts" not in catalog_source:
+    raise SystemExit("Catalog favorite/recurrence persistence is missing")
+if "var priceTarget: Double?" not in catalog_model or "var priceTargetUnit: String?" not in catalog_model:
+    raise SystemExit("Catalog price-target fields are missing")
+price_target_source = (root / "app/src/main/java/com/listamercado/app/util/PriceTargetHelper.kt").read_text(encoding="utf-8")
+shopping_adapter_source = (root / "app/src/main/java/com/listamercado/app/ui/ShoppingItemAdapter.kt").read_text(encoding="utf-8")
+compare_source = (root / "app/src/main/java/com/listamercado/app/ui/CompareActivity.kt").read_text(encoding="utf-8")
+if "setPriceTarget" not in catalog_source or "setPriceTargetByName" not in catalog_source:
+    raise SystemExit("Price-target persistence/editing is missing")
+if "BELOW" not in price_target_source or "WITHIN" not in price_target_source or "ABOVE" not in price_target_source:
+    raise SystemExit("Price-target below/within/above evaluation is missing")
+if "textPriceTargetStatus" not in shopping_adapter_source or "PriceTargetHelper.statusText" not in shopping_adapter_source:
+    raise SystemExit("List price-target status is missing")
+if "textPurchaseTargetStatus" not in purchase_adapter_source or "PriceTargetHelper.statusText" not in purchase_adapter_source:
+    raise SystemExit("Purchase mode price-target status is missing")
+if "Último anterior" not in compare_source or "Alvo:" not in compare_source or "Média:" not in compare_source:
+    raise SystemExit("Price history target/last/average comparison is missing")
+recurrence_source = (root / "app/src/main/java/com/listamercado/app/model/Recurrence.kt").read_text(encoding="utf-8")
+if 'const val WEEKLY = "weekly"' not in recurrence_source or 'const val BIWEEKLY = "biweekly"' not in recurrence_source or 'const val MONTHLY = "monthly"' not in recurrence_source:
+    raise SystemExit("Weekly/biweekly/monthly recurrence options are missing")
+if "buttonAddRecurring" not in detail_source or "RecurringProductsActivity" not in manifest or "selectedProducts" not in recurring_activity:
+    raise SystemExit("Add recurring products flow is missing")
+for name in ("Cicloviagem", "Compra do mês", "Churrasco", "Camping", "Limpeza"):
+    if name not in template_source:
+        raise SystemExit(f"Initial list template missing: {name}")
+if 'ListTemplate(BUILTIN_MONTHLY_ID, "Compra do mês", builtIn = true)' not in template_source or 'ListTemplate(BUILTIN_CAMPING_ID, "Camping", builtIn = true)' not in template_source:
+    raise SystemExit("Non-Cicloviagem initial templates must remain empty")
+if "saveFromList" not in template_source or "createListFromTemplate" not in template_source or "buttonActionTemplate" not in list_actions_source:
+    raise SystemExit("Save-list-as-template flow is missing")
+if "TemplatesActivity" not in manifest or "Usar modelo" not in main_source or "templateRepository.createListFromTemplate" not in templates_activity:
+    raise SystemExit("Create-list-from-template flow is missing")
+
+
+if "buttonMarketList" not in market_item_layout or "textMarketSource" not in market_item_layout or "Abrir lista deste mercado" not in map_source:
+    raise SystemExit("Market cards must expose source and create/open-list actions")
+if "AndroidMarket.toggleFavorite" not in map_html or "AndroidMarket.listAction" not in map_html:
+    raise SystemExit("Map popup favorite/list actions are missing")
+if "Sua localização foi obtida normalmente" not in map_source or "temporariamente indisponível" not in map_source:
+    raise SystemExit("Market empty/error messaging must distinguish location from Overpass availability")
+
+shopping_item_model = (root / "app/src/main/java/com/listamercado/app/model/ShoppingItem.kt").read_text(encoding="utf-8")
+shopping_list_model = (root / "app/src/main/java/com/listamercado/app/model/ShoppingList.kt").read_text(encoding="utf-8")
+purchase_item_layout = (root / "app/src/main/res/layout/item_purchase_mode.xml").read_text(encoding="utf-8")
+if "var purchasedQuantity: Double" not in shopping_item_model or "purchasedSubtotal" not in shopping_item_model:
+    raise SystemExit("Planned vs purchased quantity model is missing")
+if "items.sumOf { it.subtotal }" not in shopping_list_model or "it.purchasedSubtotal" not in shopping_list_model:
+    raise SystemExit("Estimated total must use planned quantity and cart total must use purchased quantity")
+if "inputPurchasedQuantity" not in purchase_adapter_source or "onPurchasedQuantityChanged" not in purchase_adapter_source:
+    raise SystemExit("Purchase mode must let the user enter the actually purchased quantity")
+if "Total pago" not in purchase_item_layout or "Comprado" not in purchase_item_layout:
+    raise SystemExit("Purchase mode labels for actual quantity / paid total are missing")
+if "item.ensurePurchasedQuantity()" not in purchase_mode_source or "item.ensurePurchasedQuantity()" not in detail_source:
+    raise SystemExit("Mark-as-purchased flow must initialize actual quantity from planned quantity when needed")
+if "item.purchasedSubtotal" not in compare_source or "comprado:" not in compare_source:
+    raise SystemExit("Price history must show actual purchased quantity and paid total")
+
+backup_source = (root / "app/src/main/java/com/listamercado/app/data/BackupRepository.kt").read_text(encoding="utf-8")
+if 'const val SCHEMA_VERSION = 5' not in backup_source or '"meu-supermercado-backup"' not in backup_source:
+    raise SystemExit("Versioned JSON backup format is missing")
+if 'put("templates",' not in backup_source or 'put("favorite", favorite)' not in backup_source or 'put("recurringFrequency", recurringFrequency' not in backup_source:
+    raise SystemExit("Backup must preserve templates, product favorites and recurrence")
+if 'put("marketPreferences",' not in backup_source or 'put("marketKey", marketKey' not in backup_source:
+    raise SystemExit("Schema 3 backup must preserve market favorites/radius and list associations")
+if 'put("priceTarget", priceTarget' not in backup_source or 'put("priceTargetUnit", priceTargetUnit' not in backup_source:
+    raise SystemExit("Schema 4 backup must preserve product price targets")
+if 'put("purchasedQuantity", purchasedQuantity)' not in backup_source or 'put("paidTotal", item.purchasedSubtotal)' not in backup_source:
+    raise SystemExit("Schema 5 backup must preserve actual purchased quantity and paid total")
+if "parseAndValidate" not in backup_source or "mergeWith" not in backup_source or "replaceWith" not in backup_source:
+    raise SystemExit("Backup validation/import modes are missing")
+if 'put("priceHistory", history)' not in backup_source or "createCsvExport" not in backup_source:
+    raise SystemExit("Price-history backup or CSV export is missing")
+if "rowExportBackup" not in settings_layout or "rowImportBackup" not in settings_layout or "rowExportCsv" not in settings_layout:
+    raise SystemExit("Backup/CSV controls are missing from Settings")
+if "ActivityResultContracts.CreateDocument" not in settings_activity_source or "ActivityResultContracts.OpenDocument" not in settings_activity_source:
+    raise SystemExit("Backup must use Android document pickers instead of a fixed folder")
+if 'setPositiveButton("Mesclar")' not in settings_activity_source or 'setNeutralButton("Substituir")' not in settings_activity_source:
+    raise SystemExit("Import summary must offer merge and replace modes")
+item_layout = (root / "app/src/main/res/layout/dialog_item.xml").read_text(encoding="utf-8")
+if "PRODUTO" not in item_layout or "COMPRA" not in item_layout or "DETALHES" not in item_layout:
+    raise SystemExit("Redesigned item editor sections are missing")
+if "Widget.Material3.TextInputLayout.FilledBox" not in item_layout:
+    raise SystemExit("Item editor must use the reduced-outline filled field style")
+if 'placeholderText="Ex.: Arroz, café, sabão em pó"' not in item_layout or "textLookupStatus" not in item_layout:
+    raise SystemExit("Item editor refinements for product-name entry and lookup feedback are missing")
+if "layoutPriceTarget" not in item_layout or "inputPriceTarget" not in item_layout:
+    raise SystemExit("Item editor price-target field is missing")
+
+# Keep source packages clean: APKs are release outputs and must not be committed/zipped.
+apks = [p.relative_to(root).as_posix() for p in root.rglob("*.apk")]
+if apks:
+    raise SystemExit("APK files found inside source tree: " + ", ".join(apks))
+
+# Modular-project guard used by this project.
+oversized = []
+for kt in root.rglob("*.kt"):
+    lines = sum(1 for _ in kt.open(encoding="utf-8"))
+    if lines > 500:
+        oversized.append(f"{kt.relative_to(root)} ({lines} lines)")
+if oversized:
+    raise SystemExit("Kotlin files over 500 lines: " + ", ".join(oversized))
+
+print("Native Android source OK: Kotlin/XML project, BuildConfig valid, release workflow present, no Flutter commands, no APK in source.")

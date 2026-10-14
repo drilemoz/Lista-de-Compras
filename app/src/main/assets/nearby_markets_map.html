@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyo7CC0M9lPz+U4=" crossorigin="anonymous" />
+  <style>
+    html, body, #map { width:100%; height:100%; margin:0; padding:0; background:#111F2B; }
+    .leaflet-control-attribution { font-size:10px; }
+    .market-popup { min-width:210px; font-family:sans-serif; }
+    .market-popup h3 { margin:0 0 5px; font-size:15px; }
+    .market-popup p { margin:3px 0; font-size:12px; color:#555; }
+    .market-popup .origin { margin-bottom:10px; color:#6c6c6c; }
+    .market-popup button {
+      width:100%; border:0; border-radius:12px; padding:10px 12px;
+      font-weight:700; margin-top:7px;
+    }
+    .primary { background:#6D4FD3; color:white; }
+    .secondary { background:#EEE9FF; color:#4D369F; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+<script>
+  const map = L.map('map', { zoomControl: true }).setView([-15.78, -47.93], 4);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  let userMarker = null;
+  const marketLayer = L.layerGroup().addTo(map);
+
+  function setUserLocation(lat, lon) {
+    if (userMarker) map.removeLayer(userMarker);
+    userMarker = L.circleMarker([lat, lon], {
+      radius: 8,
+      color: '#385F8A',
+      fillColor: '#5F8FC2',
+      fillOpacity: 1,
+      weight: 3
+    }).addTo(map).bindPopup('Sua localização');
+    map.setView([lat, lon], 13);
+  }
+
+  function renderMarkets(markets) {
+    marketLayer.clearLayers();
+    const bounds = [];
+    if (userMarker) bounds.push(userMarker.getLatLng());
+
+    markets.forEach(function(m) {
+      const marker = L.circleMarker([m.lat, m.lon], {
+        radius: m.favorite ? 9 : 7,
+        color: m.favorite ? '#A66A00' : '#6D4FD3',
+        fillColor: m.favorite ? '#FFC857' : '#8B6CF6',
+        fillOpacity: 1,
+        weight: m.favorite ? 3 : 2
+      }).addTo(marketLayer);
+
+      const distance = m.distanceMeters < 1000
+        ? Math.round(m.distanceMeters) + ' m'
+        : (m.distanceMeters / 1000).toFixed(1).replace('.', ',') + ' km';
+
+      const popup = document.createElement('div');
+      popup.className = 'market-popup';
+
+      const title = document.createElement('h3');
+      title.textContent = (m.favorite ? '★ ' : '') + (m.name || 'Mercado');
+      popup.appendChild(title);
+
+      const detail = document.createElement('p');
+      detail.textContent = (m.address ? m.address + ' • ' : '') + distance;
+      popup.appendChild(detail);
+
+      const origin = document.createElement('p');
+      origin.className = 'origin';
+      origin.textContent = 'Origem: ' + (m.source || 'OpenStreetMap') + (m.fromCache ? ' • cache recente' : ' • Overpass');
+      popup.appendChild(origin);
+
+      const listButton = document.createElement('button');
+      listButton.className = 'primary';
+      listButton.textContent = m.hasList ? 'Abrir lista deste mercado' : 'Criar lista';
+      listButton.onclick = function() { AndroidMarket.listAction(m.key); };
+      popup.appendChild(listButton);
+
+      const favoriteButton = document.createElement('button');
+      favoriteButton.className = 'secondary';
+      favoriteButton.textContent = m.favorite ? 'Remover dos favoritos' : 'Favoritar mercado';
+      favoriteButton.onclick = function() { AndroidMarket.toggleFavorite(m.key); };
+      popup.appendChild(favoriteButton);
+
+      marker.bindPopup(popup);
+      bounds.push([m.lat, m.lon]);
+    });
+
+    if (bounds.length > 1) {
+      map.fitBounds(bounds, { padding:[24,24], maxZoom:14 });
+    }
+  }
+</script>
+</body>
+</html>

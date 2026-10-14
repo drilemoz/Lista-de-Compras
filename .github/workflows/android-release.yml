@@ -1,0 +1,204 @@
+name: Build and Release Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lista-de-compras-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove legacy Android CI workflow
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          LEGACY=".github/workflows/android.yml"
+          if [ ! -f "$LEGACY" ]; then
+            echo "Legacy Android CI workflow already absent."
+            exit 0
+          fi
+
+          echo "Removing legacy workflow: $LEGACY"
+          rm -f "$LEGACY"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u "$LEGACY"
+
+          if git diff --cached --quiet; then
+            echo "No cleanup commit required."
+            exit 0
+          fi
+
+          git commit -m "Remove legacy Android CI workflow [skip ci]"
+          git push origin HEAD:main
+
+      - name: Validate source and version
+        run: |
+          python3 scripts/validate_version.py
+          python3 scripts/validate_branding.py
+          python3 scripts/validate_source.py
+          python3 scripts/validate_workflow.py
+          python3 scripts/validate_repaginacao.py
+          python3 scripts/validate_ui_restyle.py
+          python3 scripts/validate_resource_styles.py
+          python3 scripts/validate_purchase_catalog.py
+          python3 scripts/validate_final.py
+          python3 scripts/validate_location_lint.py
+          python3 scripts/validate_lint_build25.py
+          python3 scripts/validate_lint_build26.py
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Setup Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Unit tests, Debug build and Android Lint
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Se o Lint falhar, exponha todos os erros no log (Gradle exibe apenas o primeiro).
+          if ! gradle :app:testDebugUnitTest :app:assembleDebug :app:lintDebug --stacktrace; then
+            REPORT="app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt"
+            if [ -f "$REPORT" ]; then
+              echo "::group::Relatório Android Lint - erros completos"
+              grep -n -B 1 -A 4 -E ': Error: |^[0-9]+ errors' "$REPORT" || true
+              echo "::endgroup::"
+            else
+              echo "Relatório de Lint indisponível: a falha pode ter ocorrido antes da análise."
+            fi
+            exit 1
+          fi
+
+      - name: Resolve signing secrets
+        id: signing
+        shell: bash
+        env:
+          KS_ANDROID: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_LISTA: ${{ secrets.LISTA_MERCADO_KEYSTORE_BASE64 }}
+          KS_GENERIC: ${{ secrets.KEYSTORE_BASE64 }}
+          KS_SIGNING: ${{ secrets.SIGNING_KEY }}
+
+          STORE_ANDROID: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          STORE_LISTA: ${{ secrets.LISTA_MERCADO_KEYSTORE_PASSWORD }}
+          STORE_GENERIC: ${{ secrets.KEYSTORE_PASSWORD }}
+          STORE_SIGNING: ${{ secrets.SIGNING_STORE_PASSWORD }}
+
+          ALIAS_ANDROID: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ALIAS_LISTA: ${{ secrets.LISTA_MERCADO_KEY_ALIAS }}
+          ALIAS_GENERIC: ${{ secrets.KEY_ALIAS }}
+          ALIAS_SIGNING: ${{ secrets.SIGNING_KEY_ALIAS }}
+
+          KEY_ANDROID: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_LISTA: ${{ secrets.LISTA_MERCADO_KEY_PASSWORD }}
+          KEY_GENERIC: ${{ secrets.KEY_PASSWORD }}
+          KEY_SIGNING: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          first_non_empty() {
+            for value in "$@"; do
+              if [ -n "$value" ]; then
+                printf '%s' "$value"
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          KS="$(first_non_empty "$KS_ANDROID" "$KS_LISTA" "$KS_GENERIC" "$KS_SIGNING" || true)"
+          STORE_PASS="$(first_non_empty "$STORE_ANDROID" "$STORE_LISTA" "$STORE_GENERIC" "$STORE_SIGNING" || true)"
+          ALIAS="$(first_non_empty "$ALIAS_ANDROID" "$ALIAS_LISTA" "$ALIAS_GENERIC" "$ALIAS_SIGNING" || true)"
+          KEY_PASS="$(first_non_empty "$KEY_ANDROID" "$KEY_LISTA" "$KEY_GENERIC" "$KEY_SIGNING" || true)"
+
+          if [ -z "$KS" ]; then
+            echo "::error::Nenhuma chave permanente encontrada."
+            exit 1
+          fi
+          if [ -z "$STORE_PASS" ]; then
+            echo "::error::Senha do keystore ausente."
+            exit 1
+          fi
+          if [ -z "$ALIAS" ]; then
+            echo "::error::Alias da chave ausente."
+            exit 1
+          fi
+          if [ -z "$KEY_PASS" ]; then
+            echo "::error::Senha da chave ausente."
+            exit 1
+          fi
+
+          printf '%s' "$KS" | tr -d '\r\n ' | base64 --decode > "$RUNNER_TEMP/lista-de-compras-release.jks"
+          test -s "$RUNNER_TEMP/lista-de-compras-release.jks"
+
+          echo "store_password=$STORE_PASS" >> "$GITHUB_OUTPUT"
+          echo "key_alias=$ALIAS" >> "$GITHUB_OUTPUT"
+          echo "key_password=$KEY_PASS" >> "$GITHUB_OUTPUT"
+
+      - name: Build signed Release APK
+        shell: bash
+        env:
+          LISTA_MERCADO_KEYSTORE_PATH: ${{ runner.temp }}/lista-de-compras-release.jks
+          LISTA_MERCADO_KEYSTORE_PASSWORD: ${{ steps.signing.outputs.store_password }}
+          LISTA_MERCADO_KEY_ALIAS: ${{ steps.signing.outputs.key_alias }}
+          LISTA_MERCADO_KEY_PASSWORD: ${{ steps.signing.outputs.key_password }}
+        run: |
+          set -euo pipefail
+          gradle :app:assembleRelease --stacktrace
+
+      - name: Validate signing and rename APK
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          VERSION_NAME="${VERSION%%+*}"
+          SRC="app/build/outputs/apk/release/app-release.apk"
+          test -s "$SRC"
+
+          OUT="Lista-de-Compras-v${VERSION_NAME}.apk"
+          cp "$SRC" "$OUT"
+
+          unzip -t "$OUT" >/dev/null
+          keytool -printcert -jarfile "$OUT" >/dev/null
+
+          echo "version=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "file=$OUT" >> "$GITHUB_OUTPUT"
+
+      - name: Publish APK directly to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.apk.outputs.version }}
+          name: Lista de Compras v${{ steps.apk.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          files: ${{ steps.apk.outputs.file }}
+          generate_release_notes: true
+          overwrite_files: true
+          make_latest: true

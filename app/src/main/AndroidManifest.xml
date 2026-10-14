@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_app"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_app"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ListaMercado">
+        <activity android:name=".ui.WhatsNewActivity" android:exported="false" android:launchMode="singleTop" />
+        <activity android:name=".ui.NearbyMarketsActivity" android:exported="false" />
+        <activity android:name=".ui.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.CatalogActivity" android:exported="false" />
+        <activity android:name=".ui.TemplatesActivity" android:exported="false" />
+        <activity android:name=".ui.RecurringProductsActivity" android:exported="false" />
+        <activity android:name=".ui.BarcodeScannerActivity" android:exported="false" />
+        <activity android:name=".ui.CompareActivity" android:exported="false" />
+        <activity android:name=".ui.PurchaseModeActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.ListDetailActivity" android:exported="false" />
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

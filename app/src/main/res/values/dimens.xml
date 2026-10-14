@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="lm_spacing_small">8dp</dimen>
+    <dimen name="lm_spacing_regular">16dp</dimen>
+    <dimen name="lm_spacing_large">24dp</dimen>
+    <dimen name="lm_radius_card">20dp</dimen>
+    <dimen name="lm_radius_hero">26dp</dimen>
+    <dimen name="lm_radius_button">16dp</dimen>
+    <dimen name="lm_radius_input">16dp</dimen>
+</resources>

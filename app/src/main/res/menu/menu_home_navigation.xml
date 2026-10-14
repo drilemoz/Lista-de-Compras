@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/navLists" android:icon="@drawable/ic_list" android:title="Listas" android:checkable="true" />
+    <item android:id="@+id/navCatalog" android:icon="@drawable/ic_barcode" android:title="Produtos" android:checkable="true" />
+    <item android:id="@+id/navPrices" android:icon="@drawable/ic_compare" android:title="Preços" android:checkable="true" />
+    <item android:id="@+id/navMarkets" android:icon="@drawable/ic_store" android:title="Mercados" android:checkable="true" />
+</menu>
