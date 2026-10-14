@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.37+41`
+`1.0.38+42`
 
 ## Identidade técnica
 
@@ -17,6 +17,17 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.38+42 (editor, categorias e combos)
+
+- Tela de inclusão/edição de produtos reconstruída com cabeçalho e ação Salvar fixos, contornos discretos e opções secundárias recolhíveis.
+- Seletor de emojis em grade de cinco colunas, com estado visual da seleção e possibilidade de alterar ícone de categoria existente sem modificar seu nome.
+- Calculadora de ofertas: total do combo ÷ quantidade de unidades (2 a 999), exibindo preço por unidade arredondado, mas preservando a precisão para cálculos de subtotal.
+- O total monetário é calculado a partir do valor original da oferta e arredondado apenas no fim, evitando R$ 14,79 virar R$ 14,80 em ofertas de 2 unidades.
+- Metadados `comboTotalPrice`/`comboUnitCount` persistidos em listas, modelos e backup JSON schema 7; leitores aceitam backups anteriores. Exportação CSV inclui as duas colunas.
+- No modo de compra, a edição manual do total substitui os metadados da oferta, para não mostrar valores antigos nos totais.
+- Android continua em `com.listadecompras.app`, preservando dados locais e assinatura (os Secrets de assinatura não foram alterados).
+- Verificações estáticas e testes de cálculo documentados; compilação Gradle/Android ainda não confirmada neste ambiente.
 
 ## Atualização 1.0.37+41 (correção do Build 2)
 

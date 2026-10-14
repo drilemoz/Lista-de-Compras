@@ -187,7 +187,7 @@ class PurchaseModeAdapter(
             if (item.purchasedQuantity != value) onPurchasedQuantityChanged(item, value)
             if (!priceDirty && item.unitPrice > 0.0 && value > 0.0) {
                 binding = true
-                price.setText(priceFormat.format(item.unitPrice * value))
+                price.setText(priceFormat.format(item.copy(purchasedQuantity = value).purchasedSubtotal))
                 binding = false
             }
             rememberDraft()
@@ -231,7 +231,7 @@ class PurchaseModeAdapter(
             binding = true
             purchasedQuantity.setText(quantityFormat.format(actualQuantity))
             purchasedQuantity.setSelection(purchasedQuantity.text?.length ?: 0)
-            price.setText(if (item.unitPrice > 0.0) priceFormat.format(item.unitPrice * actualQuantity) else "")
+            price.setText(if (item.unitPrice > 0.0) priceFormat.format(item.copy(purchasedQuantity = actualQuantity).purchasedSubtotal) else "")
             price.setSelection(price.text?.length ?: 0)
             drafts[item.id]?.let { draft ->
                 purchasedQuantity.setText(draft.quantity)
@@ -266,7 +266,7 @@ class PurchaseModeAdapter(
                 ?: item.purchasedQuantity.takeIf { it > 0.0 }
                 ?: item.quantity
             unitPrice.text = if (item.unitPrice > 0.0) {
-                "${PriceUnitHelper.formattedUnitPrice(item, currency)} • total ${currency.format(item.unitPrice * actualQuantity)}"
+                "${PriceUnitHelper.formattedUnitPrice(item, currency)} • total ${currency.format(item.copy(purchasedQuantity = actualQuantity).purchasedSubtotal)}"
             } else {
                 "Informe quanto comprou e o total pago"
             }

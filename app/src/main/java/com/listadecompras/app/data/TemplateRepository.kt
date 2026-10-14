@@ -127,6 +127,8 @@ class TemplateRepository(context: Context) {
         put("purchasedQuantity", 0.0)
         put("unit", unit)
         put("unitPrice", unitPrice)
+        put("comboTotalPrice", comboTotalPrice ?: JSONObject.NULL)
+        put("comboUnitCount", comboUnitCount ?: JSONObject.NULL)
         put("category", category)
         put("note", note)
         put("purchased", false)
@@ -151,6 +153,8 @@ class TemplateRepository(context: Context) {
         purchasedQuantity = 0.0,
         unit = optString("unit", "un").ifBlank { "un" },
         unitPrice = optDouble("unitPrice", 0.0).coerceAtLeast(0.0),
+        comboTotalPrice = if (isNull("comboTotalPrice")) null else optDouble("comboTotalPrice").takeIf { it.isFinite() && it > 0 },
+        comboUnitCount = if (isNull("comboUnitCount")) null else optInt("comboUnitCount").takeIf { it in 2..999 },
         category = optString("category", "Outros").ifBlank { "Outros" },
         note = optString("note", ""),
         purchased = false

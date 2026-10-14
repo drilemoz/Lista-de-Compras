@@ -1,9 +1,9 @@
-# Lista de Compras 1.0.37+41
+# Lista de Compras 1.0.38+42
 
-- Correção do workflow após Build 2: o Debug, os testes unitários e o Android Lint haviam passado, porém a assinatura falhou por falta dos Secrets no GitHub.
-- APK Debug entregue via **Actions > Artifacts** após cada build aprovado, independentemente da assinatura Release.
-- Publicação de Release condicionada a quatro Secrets de um mesmo conjunto (preferência por `LISTA_COMPRAS_*`). Não há combinação de campos de conjuntos diferentes.
-- Validação do APK Release por `apksigner verify` e verificação da keystore antes de construir.
-- Permanecem o identificador `com.listadecompras.app`, as categorias SQLite com ícones, a nova criação de listas e o backup JSON schema 6 compatível com versões anteriores.
+- Redesenho do editor de produtos com cabeçalho e botões fixos; menos rolagem, campo opcional recolhível.
+- Escolha de ícones em grade e edição de ícones de categorias existentes, persistidos em SQLite.
+- Calculadora para promoções com várias unidades: 2 por R$ 14,79 indica R$ 7,40 por unidade, enquanto o subtotal preserva R$ 14,79.
+- Dados da promoção gravados em listas, modelos e backup JSON schema 7, com importação dos schemas anteriores; CSV com colunas de combo.
+- Compatível com applicationId e Secrets da versão anterior.
 
-**Para distribuir APK Release atualizável:** configure os Secrets de assinatura reais no repositório conforme `SIGNING-SECRETS.txt`. Sem esses Secrets, o GitHub Actions gera apenas o APK Debug. Uma instalação assinada com Debug não é substituída pela Release sem desinstalação; faça backup antes de migrar.
+**A validar:** compilar o APK em GitHub Actions e testar o formulário e cálculos num aparelho Android.

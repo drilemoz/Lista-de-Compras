@@ -57,6 +57,7 @@ jobs:
           python3 scripts/validate_version.py
           python3 scripts/validate_branding.py
           python3 scripts/validate_categories_and_identity.py
+          python3 scripts/validate_price_split_and_ui.py
           python3 scripts/validate_source.py
           python3 scripts/validate_workflow.py
           python3 scripts/validate_repaginacao.py

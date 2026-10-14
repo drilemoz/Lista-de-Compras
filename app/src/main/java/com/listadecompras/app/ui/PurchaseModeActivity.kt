@@ -108,6 +108,9 @@ class PurchaseModeActivity : AppCompatActivity() {
 
     private fun updateQuickPrice(item: ShoppingItem, totalPrice: Double) {
         val actualQuantity = item.purchasedQuantity.takeIf { it > 0.0 } ?: item.quantity
+        // Preço inserido manualmente substitui os dados da oferta anterior.
+        item.comboTotalPrice = null
+        item.comboUnitCount = null
         item.unitPrice = if (actualQuantity > 0.0) totalPrice / actualQuantity else 0.0
         catalogRepository.recordItem(item)
         persist(renderItems = false)

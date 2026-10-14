@@ -47,6 +47,19 @@ class CategoryRepository(context: Context) : SQLiteOpenHelper(context.applicatio
         return value
     }
 
+    /** Atualiza apenas o ícone; preserva o nome e os produtos da categoria. */
+    fun updateIcon(name: String, icon: String): PurchaseCategory {
+        require(icon in icons) { "Ícone inválido." }
+        val existing = all().firstOrNull { it.name.equals(name.trim(), ignoreCase = true) }
+            ?: throw IllegalArgumentException("Categoria não encontrada.")
+        val changed = ContentValues().apply { put("icon", icon) }
+        check(writableDatabase.update("categories", changed, "name = ? COLLATE NOCASE", arrayOf(existing.name)) == 1) {
+            "Não foi possível atualizar o ícone."
+        }
+        invalidateIconCache()
+        return existing.copy(icon = icon)
+    }
+
     /** Restauro ou importação: não sobrescreve categorias existentes com o mesmo nome. */
     fun merge(values: List<PurchaseCategory>) {
         val db = writableDatabase
@@ -72,13 +85,15 @@ class CategoryRepository(context: Context) : SQLiteOpenHelper(context.applicatio
         val db = writableDatabase
         db.beginTransaction()
         try {
-            db.delete("categories", "custom = 1", null)
+            // Substituição restaura também ícones modificados das categorias padrão.
+            db.delete("categories", null, null)
+            defaults.forEach { db.insertOrThrow("categories", null, it.values()) }
             values.forEach { value ->
                 val cleaned = value.name.trim().replace(Regex("\\s+"), " ")
                 if (cleaned.length in 2..40 && !cleaned.contains(Regex("[\\p{Cntrl}<>]"))) {
                     db.insertWithOnConflict("categories", null,
                         PurchaseCategory(cleaned, value.icon.takeIf { it in icons } ?: "🛒", value.custom).values(),
-                        SQLiteDatabase.CONFLICT_IGNORE)
+                        SQLiteDatabase.CONFLICT_REPLACE)
                 }
             }
             db.setTransactionSuccessful()

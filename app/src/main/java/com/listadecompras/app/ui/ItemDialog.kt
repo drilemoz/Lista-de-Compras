@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import com.google.android.material.checkbox.MaterialCheckBox
+import com.listadecompras.app.util.PriceSplitHelper
+import java.text.NumberFormat
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -29,7 +32,7 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 
 object ItemDialog {
-    private const val DEFAULT_CATEGORY = "Hortifruti"
+    private const val DEFAULT_CATEGORY = "Outros"
     private val units = listOf("un", "kg", "g", "L", "mL", "pct", "pacote", "lata", "cx")
 
     fun show(
@@ -63,6 +66,22 @@ object ItemDialog {
         val category = view.findViewById<MaterialAutoCompleteTextView>(R.id.spinnerCategory)
         val newCategoryButton = view.findViewById<MaterialButton>(R.id.buttonNewCategory)
         val selectedCategoryIcon = view.findViewById<TextView>(R.id.textSelectedCategoryIcon)
+        val checkSplit = view.findViewById<MaterialCheckBox>(R.id.checkSplitPrice)
+        val comboCard = view.findViewById<View>(R.id.cardSplitPrice)
+        val comboTotalLayout = view.findViewById<TextInputLayout>(R.id.layoutComboTotal)
+        val comboCountLayout = view.findViewById<TextInputLayout>(R.id.layoutComboUnits)
+        val comboTotal = view.findViewById<TextInputEditText>(R.id.inputComboTotal)
+        val comboCount = view.findViewById<TextInputEditText>(R.id.inputComboUnits)
+        val comboPreview = view.findViewById<TextView>(R.id.textComboPreview)
+        val moreButton = view.findViewById<MaterialButton>(R.id.buttonMoreOptions)
+        val moreContainer = view.findViewById<View>(R.id.containerMoreOptions)
+        moreButton.setOnClickListener {
+            moreContainer.visibility = if (moreContainer.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            moreButton.text = if (moreContainer.visibility == View.VISIBLE) "Ocultar opções" else "Mais opções: preço-alvo e observação"
+        }
+        val comboWatcher = CurrencyTextWatcher(comboTotal)
+        comboTotal.addTextChangedListener(comboWatcher)
+        val brazilCurrency = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         val categoryRepository = CategoryRepository(context)
         var categories = categoryRepository.all()
 
@@ -104,9 +123,9 @@ object ItemDialog {
             )
         )
 
-        title.text = if (existing == null) "Adicionar item" else "Editar item"
+        title.text = if (existing == null) "Adicionar produto" else "Editar produto"
         subtitle.text = if (existing == null) {
-            "Escolha do catálogo, escaneie o código ou cadastre um produto novo."
+            "Pesquise no catálogo ou adicione um produto."
         } else {
             "Altere os dados sem perder o histórico da lista."
         }
@@ -121,6 +140,12 @@ object ItemDialog {
                 refreshCategories(created.name)
             }
         }
+        selectedCategoryIcon.setOnClickListener {
+            val current = category.text?.toString()?.trim().orEmpty()
+            CategoryDialog.editIcon(context, categoryRepository, current) { edited ->
+                refreshCategories(edited.name)
+            }
+        }
         unit.setSimpleItems(units.toTypedArray())
         category.setText(DEFAULT_CATEGORY, false)
         unit.setText(units.first(), false)
@@ -132,6 +157,34 @@ object ItemDialog {
         var pendingLookupBarcode: String? = null
         var suppressNameWatcher = false
         var statusMessage: String? = null
+
+        fun updateSplitPreview() {
+            if (!checkSplit.isChecked) return
+            val total = comboWatcher.amount()
+            val count = comboCount.text?.toString()?.toIntOrNull() ?: 0
+            if (PriceSplitHelper.isValid(total, count)) {
+                comboPreview.text = "${brazilCurrency.format(PriceSplitHelper.roundedUnitPrice(total, count))} por ${PriceUnitHelper.priceUnit(unit.text?.toString().orEmpty().ifBlank { "un" })}"
+                priceWatcher.setAmount(PriceSplitHelper.roundedUnitPrice(total, count))
+                comboTotalLayout.error = null
+                comboCountLayout.error = null
+            } else {
+                comboPreview.text = "Informe o total e entre 2 e 999 unidades."
+                priceWatcher.setAmount(0.0)
+            }
+        }
+        var manualPriceBeforeSplit = 0.0
+        checkSplit.setOnCheckedChangeListener { _, enabled ->
+            if (enabled) manualPriceBeforeSplit = priceWatcher.amount()
+            comboCard.visibility = if (enabled) View.VISIBLE else View.GONE
+            price.isEnabled = !enabled
+            priceLayout.hint = if (enabled) "Preço unitário calculado" else PriceUnitHelper.inputHint(unit.text?.toString().orEmpty())
+            if (enabled) updateSplitPreview()
+            else {
+                priceWatcher.setAmount(manualPriceBeforeSplit)
+            }
+        }
+        comboTotal.doAfterTextChanged { updateSplitPreview() }
+        comboCount.doAfterTextChanged { updateSplitPreview() }
 
         fun setLookupStatus(message: String?, visibleWhenEmpty: Boolean = false) {
             statusMessage = message
@@ -165,6 +218,11 @@ object ItemDialog {
             category.setText(product.category.ifBlank { DEFAULT_CATEGORY }, false)
             unit.setText(product.unit.ifBlank { units.first() }, false)
             priceLayout.hint = PriceUnitHelper.inputHint(product.unit)
+            if (checkSplit.isChecked) {
+                checkSplit.isChecked = false
+                comboWatcher.setAmount(0.0)
+                comboCount.setText("")
+            }
             if (product.lastUnitPrice > 0.0) {
                 priceWatcher.setAmount(PriceUnitHelper.editorAmount(product.lastUnitPrice, product.unit))
             }
@@ -228,12 +286,20 @@ object ItemDialog {
                 purchasedQuantity.setText((it.purchasedQuantity.takeIf { value -> value > 0.0 } ?: it.quantity).toInput())
             }
             priceWatcher.setAmount(PriceUnitHelper.editorAmount(it.unitPrice, it.unit))
+            if (it.comboTotalPrice != null && it.comboUnitCount != null &&
+                PriceSplitHelper.isValid(it.comboTotalPrice!!, it.comboUnitCount!!)) {
+                comboWatcher.setAmount(it.comboTotalPrice!!)
+                comboCount.setText(it.comboUnitCount!!.toString())
+                checkSplit.isChecked = true
+            }
             note.setText(it.note)
+            if (it.note.isNotBlank()) moreContainer.visibility = View.VISIBLE
             category.setText(it.category, false)
             unit.setText(it.unit, false)
-            priceLayout.hint = PriceUnitHelper.inputHint(it.unit)
+            if (!checkSplit.isChecked) priceLayout.hint = PriceUnitHelper.inputHint(it.unit)
             catalogRepository.findByName(it.name)?.let { product ->
                 targetWatcher.setAmount(product.priceTarget ?: 0.0)
+                if (product.priceTarget != null) moreContainer.visibility = View.VISIBLE
                 targetLayout.hint = "Preço-alvo por ${product.priceTargetUnit ?: PriceUnitHelper.priceUnit(it.unit)}"
             }
         } ?: run {
@@ -242,6 +308,7 @@ object ItemDialog {
             priceLayout.hint = PriceUnitHelper.inputHint(units.first())
             targetLayout.hint = "Preço-alvo por ${PriceUnitHelper.priceUnit(units.first())}"
         }
+        if (moreContainer.visibility == View.VISIBLE) moreButton.text = "Ocultar opções"
         renderBarcodeStatus()
 
         name.doAfterTextChanged {
@@ -269,7 +336,8 @@ object ItemDialog {
 
         unit.setOnItemClickListener { _, _, _, _ ->
             val unitValue = unit.text?.toString().orEmpty()
-            priceLayout.hint = PriceUnitHelper.inputHint(unitValue)
+            if (!checkSplit.isChecked) priceLayout.hint = PriceUnitHelper.inputHint(unitValue)
+            else updateSplitPreview()
             targetLayout.hint = "Preço-alvo por ${PriceUnitHelper.priceUnit(unitValue)}"
         }
 
@@ -305,6 +373,7 @@ object ItemDialog {
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.behavior.skipCollapsed = true
         dialog.behavior.isDraggable = true
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         InsetsHelper.applyBottomSheetInsets(sheet)
         dialog.setOnDismissListener {
             dialogOpen = false
@@ -319,6 +388,16 @@ object ItemDialog {
             purchasedQuantityLayout.error = null
             priceLayout.error = null
             targetLayout.error = null
+            comboTotalLayout.error = null
+            comboCountLayout.error = null
+
+            val comboValue = comboWatcher.amount()
+            val comboNumber = comboCount.text?.toString()?.toIntOrNull()
+            if (checkSplit.isChecked && (comboNumber == null || !PriceSplitHelper.isValid(comboValue, comboNumber))) {
+                if (comboValue <= 0.0) comboTotalLayout.error = "Informe um total positivo"
+                if (comboNumber == null || comboNumber !in 2..999) comboCountLayout.error = "Use de 2 a 999 unidades"
+                return@setOnClickListener
+            }
 
             val itemName = name.text?.toString()?.trim().orEmpty()
             if (itemName.isBlank()) {
@@ -356,9 +435,12 @@ object ItemDialog {
                 this.quantity = parsedQuantity
                 this.purchasedQuantity = parsedPurchasedQuantity?.coerceAtLeast(0.0) ?: 0.0
                 this.unitPrice = PriceUnitHelper.internalAmount(
-                    priceWatcher.amount().coerceAtLeast(0.0),
+                    if (checkSplit.isChecked) PriceSplitHelper.unitPrice(comboValue, comboNumber!!)
+                    else priceWatcher.amount().coerceAtLeast(0.0),
                     unitValue
                 )
+                this.comboTotalPrice = if (checkSplit.isChecked) comboValue else null
+                this.comboUnitCount = if (checkSplit.isChecked) comboNumber else null
                 this.category = categoryValue
                 this.unit = unitValue
                 this.note = note.text?.toString()?.trim().orEmpty()

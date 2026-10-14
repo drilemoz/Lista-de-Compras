@@ -35,6 +35,8 @@ object PriceUnitHelper {
 
     fun formattedUnitPrice(item: ShoppingItem, currency: NumberFormat): String {
         if (item.unitPrice <= 0.0) return "Sem preço"
-        return "${currency.format(normalizedPrice(item))}/${normalizedUnit(item)}"
+        val value = java.math.BigDecimal.valueOf(normalizedPrice(item))
+            .setScale(2, java.math.RoundingMode.HALF_UP)
+        return "${currency.format(value)}/${normalizedUnit(item)}"
     }
 }

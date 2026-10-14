@@ -1,8 +1,14 @@
 package com.listadecompras.app.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.GridLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -18,15 +24,10 @@ object CategoryDialog {
         val iconButton = view.findViewById<MaterialButton>(R.id.buttonChooseCategoryIcon)
         var selectedIcon = "🛒"
         iconButton.setOnClickListener {
-            MaterialAlertDialogBuilder(context)
-                .setTitle("Escolha um ícone")
-                .setSingleChoiceItems(CategoryRepository.icons.toTypedArray(), CategoryRepository.icons.indexOf(selectedIcon)) { dialog, which ->
-                    selectedIcon = CategoryRepository.icons[which]
-                    iconButton.text = "$selectedIcon  Alterar ícone"
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Cancelar", null)
-                .show()
+            chooseIcon(context, selectedIcon) { icon ->
+                selectedIcon = icon
+                iconButton.text = "$icon  Alterar ícone"
+            }
         }
         val dialog = MaterialAlertDialogBuilder(context)
             .setTitle("Nova categoria")
@@ -37,13 +38,87 @@ object CategoryDialog {
         dialog.setOnShowListener {
             dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
                 nameLayout.error = null
-                val saved = runCatching { repository.create(name.text?.toString().orEmpty(), selectedIcon) }
-                saved.onSuccess {
-                    onCreated(it)
-                    dialog.dismiss()
-                }.onFailure { nameLayout.error = it.message ?: "Não foi possível salvar a categoria." }
+                runCatching { repository.create(name.text?.toString().orEmpty(), selectedIcon) }
+                    .onSuccess { onCreated(it); dialog.dismiss() }
+                    .onFailure { nameLayout.error = it.message ?: "Não foi possível salvar a categoria." }
             }
         }
         dialog.show()
+    }
+
+    /** Ícone selecionado já é persistido na mesma linha SQLite da categoria. */
+    fun editIcon(context: Context, repository: CategoryRepository, categoryName: String, onUpdated: (PurchaseCategory) -> Unit) {
+        val selected = repository.all().firstOrNull { it.name.equals(categoryName, ignoreCase = true) }
+            ?: return
+        chooseIcon(context, selected.icon) { icon ->
+            runCatching { repository.updateIcon(selected.name, icon) }
+                .onSuccess(onUpdated)
+                .onFailure { error ->
+                    MaterialAlertDialogBuilder(context).setMessage(error.message ?: "Erro ao salvar ícone.")
+                        .setPositiveButton("OK", null).show()
+                }
+        }
+    }
+
+    /** Grade de cinco colunas em vez da antiga lista vertical. */
+    private fun chooseIcon(context: Context, currentIcon: String, onSelected: (String) -> Unit) {
+        val density = context.resources.displayMetrics.density
+        fun dp(size: Int) = (size * density + .5f).toInt()
+        val root = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(6), dp(16), dp(8))
+        }
+        val hint = TextView(context).apply {
+            text = "Toque em um símbolo para representar a categoria."
+            setTextColor(MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+            setPadding(dp(4), dp(4), dp(4), dp(12))
+        }
+        root.addView(hint)
+        val grid = GridLayout(context).apply {
+            columnCount = 5
+            alignmentMode = GridLayout.ALIGN_BOUNDS
+        }
+        val selectedColor = MaterialColors.getColor(root, com.google.android.material.R.attr.colorPrimaryContainer)
+        val normalColor = MaterialColors.getColor(root, com.google.android.material.R.attr.colorSurfaceContainerHigh)
+        val outlineColor = MaterialColors.getColor(root, com.google.android.material.R.attr.colorPrimary)
+        val buttons = mutableListOf<Pair<String, MaterialButton>>()
+        var selected = currentIcon
+        CategoryRepository.icons.forEachIndexed { index, emoji ->
+            val button = MaterialButton(context).apply {
+                text = emoji
+                textSize = 24f
+                isAllCaps = false
+                insetTop = 0; insetBottom = 0
+                minWidth = 0; minHeight = dp(52)
+                minimumWidth = 0; minimumHeight = dp(52)
+                icon = null
+                cornerRadius = dp(14)
+                setPadding(0, 0, 0, 0)
+                contentDescription = "Ícone $emoji"
+                setOnClickListener {
+                    selected = emoji
+                    buttons.forEach { (value, view) ->
+                        view.backgroundTintList = ColorStateList.valueOf(if (value == selected) selectedColor else normalColor)
+                        view.strokeColor = ColorStateList.valueOf(if (value == selected) outlineColor else normalColor)
+                        view.strokeWidth = if (value == selected) dp(2) else 0
+                        view.isSelected = value == selected
+                    }
+                }
+            }
+            val lp = GridLayout.LayoutParams(GridLayout.spec(index / 5), GridLayout.spec(index % 5, 1f)).apply {
+                width = 0; height = dp(56)
+                setMargins(dp(3), dp(3), dp(3), dp(3))
+            }
+            grid.addView(button, lp)
+            buttons.add(emoji to button)
+        }
+        root.addView(grid, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        buttons.firstOrNull { it.first == selected }?.second?.performClick()
+        MaterialAlertDialogBuilder(context)
+            .setTitle("Escolha o ícone")
+            .setView(root)
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Usar ícone") { _, _ -> onSelected(selected) }
+            .show()
     }
 }

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.38+42 (editor, categorias e combos)
+
+- Tela de inclusão/edição de produtos reconstruída com cabeçalho e ação Salvar fixos, contornos discretos e opções secundárias recolhíveis.
+- Seletor de emojis em grade de cinco colunas, com estado visual da seleção e possibilidade de alterar ícone de categoria existente sem modificar seu nome.
+- Calculadora de ofertas: total do combo ÷ quantidade de unidades (2 a 999), exibindo preço por unidade arredondado, mas preservando a precisão para cálculos de subtotal.
+- O total monetário é calculado a partir do valor original da oferta e arredondado apenas no fim, evitando R$ 14,79 virar R$ 14,80 em ofertas de 2 unidades.
+- Metadados `comboTotalPrice`/`comboUnitCount` persistidos em listas, modelos e backup JSON schema 7; leitores aceitam backups anteriores. Exportação CSV inclui as duas colunas.
+- No modo de compra, a edição manual do total substitui os metadados da oferta, para não mostrar valores antigos nos totais.
+- Android continua em `com.listadecompras.app`, preservando dados locais e assinatura (os Secrets de assinatura não foram alterados).
+- Verificações estáticas e testes de cálculo documentados; compilação Gradle/Android ainda não confirmada neste ambiente.
+
 ## 1.0.37+41 (14/10/2026)
 
 - **Correção do Build 2**: o log confirmou `:app:testDebugUnitTest`, `:app:assembleDebug` e `:app:lintDebug` aprovados; falhou apenas a etapa "Resolve signing secrets" porque todos os Secrets de assinatura estavam vazios.

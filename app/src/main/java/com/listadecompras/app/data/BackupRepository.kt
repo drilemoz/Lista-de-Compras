@@ -1,5 +1,4 @@
 package com.listadecompras.app.data
-
 import com.listadecompras.app.BuildConfig
 import com.listadecompras.app.model.CatalogProduct
 import com.listadecompras.app.model.ListTemplate
@@ -10,7 +9,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.time.Instant
 import java.util.Locale
-
 class BackupRepository(
     private val shoppingRepository: ShoppingRepository,
     private val catalogRepository: ProductCatalogRepository,
@@ -26,7 +24,6 @@ class BackupRepository(
         val templateCount: Int,
         val favoriteMarketCount: Int
     )
-
     data class BackupSnapshot(
         val schemaVersion: Int,
         val lists: MutableList<ShoppingList>,
@@ -37,7 +34,6 @@ class BackupRepository(
         val summary: BackupSummary,
         val categories: List<PurchaseCategory>
     )
-
     fun createJsonBackup(): String {
         val lists = shoppingRepository.loadLists()
         catalogRepository.seedFromLists(lists)
@@ -45,7 +41,6 @@ class BackupRepository(
         val history = buildPriceHistory(lists)
         val templates = templateRepository.loadUserTemplates()
         val favoriteMarketKeys = marketRepository.favoriteKeys()
-
         return JSONObject().apply {
             put("format", BACKUP_FORMAT)
             put("schemaVersion", SCHEMA_VERSION)
@@ -64,7 +59,6 @@ class BackupRepository(
             put("priceHistory", history)
         }.toString(2)
     }
-
     fun createCsvExport(): String {
         val lists = shoppingRepository.loadLists()
         catalogRepository.seedFromLists(lists)
@@ -74,13 +68,12 @@ class BackupRepository(
         lines += listOf(
             "tipo", "lista", "produto", "quantidade_planejada", "quantidade_comprada", "unidade", "preco_unitario",
             "categoria", "comprado", "orcamento_lista", "codigo_barras", "favorito", "recorrencia",
-            "preco_alvo", "unidade_preco_alvo", "atualizado_em"
+            "preco_alvo", "unidade_preco_alvo", "atualizado_em", "combo_total", "combo_unidades"
         ).joinToString(",", transform = ::csv)
-
         lists.forEach { list ->
             if (list.items.isEmpty()) {
                 lines += listOf(
-                    "LISTA", list.name, "", "", "", "", "", "", "", number(list.budget), "", "", "", "", "", instant(list.updatedAt)
+                    "LISTA", list.name, "", "", "", "", "", "", "", number(list.budget), "", "", "", "", "", instant(list.updatedAt), "", ""
                 ).joinToString(",", transform = ::csv)
             } else {
                 list.items.forEach { item ->
@@ -100,12 +93,12 @@ class BackupRepository(
                         "",
                         catalogByName[ProductCatalogRepository.normalizeName(item.name)]?.priceTarget?.let(::number).orEmpty(),
                         catalogByName[ProductCatalogRepository.normalizeName(item.name)]?.priceTargetUnit.orEmpty(),
-                        instant(list.updatedAt)
+                        instant(list.updatedAt),
+                        item.comboTotalPrice?.let(::number).orEmpty(), item.comboUnitCount?.toString().orEmpty()
                     ).joinToString(",", transform = ::csv)
                 }
             }
         }
-
         products.forEach { product ->
             lines += listOf(
                 "CATALOGO",
@@ -123,12 +116,11 @@ class BackupRepository(
                 product.recurringFrequency.orEmpty(),
                 product.priceTarget?.let(::number).orEmpty(),
                 product.priceTargetUnit.orEmpty(),
-                instant(product.updatedAt)
+                instant(product.updatedAt), "", ""
             ).joinToString(",", transform = ::csv)
         }
         return "\uFEFF" + lines.joinToString("\r\n")
     }
-
     @Throws(IllegalArgumentException::class)
     fun parseAndValidate(raw: String): BackupSnapshot {
         if (raw.isBlank()) throw IllegalArgumentException("O arquivo está vazio.")
@@ -137,7 +129,6 @@ class BackupRepository(
         } catch (_: JSONException) {
             throw IllegalArgumentException("O arquivo não contém um JSON válido.")
         }
-
         if (root.optString("format") !in setOf(BACKUP_FORMAT, LEGACY_BACKUP_FORMAT)) {
             throw IllegalArgumentException("Este arquivo não é um backup compatível com Lista de Compras.")
         }
@@ -146,12 +137,10 @@ class BackupRepository(
         if (schema > SCHEMA_VERSION) {
             throw IllegalArgumentException("Este backup usa o schema $schema, mais novo que o suportado ($SCHEMA_VERSION).")
         }
-
         val listArray = root.optJSONArray("lists")
             ?: throw IllegalArgumentException("O backup não contém a coleção de listas.")
         val catalogArray = root.optJSONArray("catalog")
             ?: throw IllegalArgumentException("O backup não contém o catálogo de produtos.")
-
         val lists = MutableList(listArray.length()) { index ->
             parseList(listArray.getJSONObject(index), index)
         }
@@ -170,7 +159,6 @@ class BackupRepository(
         val marketRadiusMeters = marketPrefs?.optInt("radiusMeters", MarketPreferencesRepository.DEFAULT_RADIUS_METERS)
             ?.takeIf { it in MarketPreferencesRepository.ALLOWED_RADIUS_METERS }
             ?: MarketPreferencesRepository.DEFAULT_RADIUS_METERS
-
         val categories = mutableListOf<PurchaseCategory>()
         root.optJSONArray("categories")?.let { array ->
             require(array.length() <= 500) { "O backup excede o limite de categorias." }
@@ -183,7 +171,6 @@ class BackupRepository(
                 categories.add(PurchaseCategory(name, obj.optString("icon", "🛒"), obj.optBoolean("custom", true)))
             }
         }
-
         // Backups antigos não tinham tabela de categorias: recuperar os nomes presentes nos itens.
         val knownNames = categories.map { it.name.lowercase(Locale.ROOT) }.toMutableSet()
         (lists.flatMap { it.items.map(ShoppingItem::category) } +
@@ -194,14 +181,12 @@ class BackupRepository(
                 categories.add(PurchaseCategory(normalized, "🛒", true))
             }
         }
-
         val duplicateListIds = lists.groupingBy { it.id }.eachCount().filterValues { it > 1 }
         if (duplicateListIds.isNotEmpty()) throw IllegalArgumentException("O backup contém listas duplicadas pelo identificador.")
         val duplicateProductIds = products.groupingBy { it.id }.eachCount().filterValues { it > 1 }
         if (duplicateProductIds.isNotEmpty()) throw IllegalArgumentException("O backup contém produtos duplicados pelo identificador.")
         val duplicateTemplateIds = templates.groupingBy { it.id }.eachCount().filterValues { it > 1 }
         if (duplicateTemplateIds.isNotEmpty()) throw IllegalArgumentException("O backup contém modelos duplicados pelo identificador.")
-
         val summary = BackupSummary(
             listCount = lists.size,
             productCount = products.size,
@@ -214,7 +199,6 @@ class BackupRepository(
         )
         return BackupSnapshot(schema, lists, products, templates, favoriteMarketKeys, marketRadiusMeters, summary, categories)
     }
-
     fun replaceWith(snapshot: BackupSnapshot) {
         shoppingRepository.saveLists(snapshot.lists, allowCorruptReplacement = true)
         val products = prepareImportedProducts(snapshot.products, snapshot.schemaVersion)
@@ -228,7 +212,6 @@ class BackupRepository(
             marketRepository.setSelectedRadiusMeters(snapshot.marketRadiusMeters)
         }
     }
-
     fun mergeWith(snapshot: BackupSnapshot) {
         val mergedLists = mergeLists(
             shoppingRepository.loadLists(),
@@ -348,6 +331,19 @@ class BackupRepository(
         if (!purchasedQuantity.isFinite() || purchasedQuantity < 0.0) throw IllegalArgumentException("Item '$name': quantidade comprada inválida.")
         if (purchased && purchasedQuantity <= 0.0) throw IllegalArgumentException("Item '$name': item comprado sem quantidade comprada.")
         if (!price.isFinite() || price < 0.0) throw IllegalArgumentException("Item '$name': preço inválido.")
+        val comboPrice = if (json.isNull("comboTotalPrice")) null else json.optDouble("comboTotalPrice", Double.NaN)
+        val comboCount = if (json.isNull("comboUnitCount")) null else json.optInt("comboUnitCount", -1)
+        if (comboPrice != null || comboCount != null) {
+            require(comboPrice != null && comboCount != null &&
+                com.listadecompras.app.util.PriceSplitHelper.isValid(comboPrice, comboCount)) {
+                "Item '$name': dados da promoção inválidos."
+            }
+            val calculated = com.listadecompras.app.util.PriceUnitHelper.internalAmount(
+                com.listadecompras.app.util.PriceSplitHelper.unitPrice(comboPrice, comboCount), json.optString("unit", "un"))
+            require(kotlin.math.abs(calculated - price) <= 0.000001) {
+                "Item '$name': preço do combo diferente do preço unitário."
+            }
+        }
         return ShoppingItem(
             id = id,
             name = name,
@@ -355,6 +351,8 @@ class BackupRepository(
             purchasedQuantity = purchasedQuantity,
             unit = json.optString("unit", "un").ifBlank { "un" },
             unitPrice = price,
+            comboTotalPrice = comboPrice,
+            comboUnitCount = comboCount,
             category = json.optString("category", "Outros").ifBlank { "Outros" },
             note = json.optString("note", ""),
             purchased = purchased
@@ -408,6 +406,8 @@ class BackupRepository(
         put("purchasedQuantity", purchasedQuantity)
         put("unit", unit)
         put("unitPrice", unitPrice)
+        put("comboTotalPrice", comboTotalPrice ?: JSONObject.NULL)
+        put("comboUnitCount", comboUnitCount ?: JSONObject.NULL)
         put("category", category)
         put("note", note)
         put("purchased", purchased)
@@ -489,7 +489,7 @@ class BackupRepository(
     private fun instant(epochMillis: Long): String = runCatching { Instant.ofEpochMilli(epochMillis).toString() }.getOrDefault("")
 
     companion object {
-        const val SCHEMA_VERSION = 6
+        const val SCHEMA_VERSION = 7
         private const val BACKUP_FORMAT = "lista-de-compras-backup"
         private const val LEGACY_BACKUP_FORMAT = "meu-supermercado-backup"
     }

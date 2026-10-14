@@ -182,6 +182,8 @@ class ShoppingRepository(context: Context) {
         put("purchasedQuantity", purchasedQuantity)
         put("unit", unit)
         put("unitPrice", unitPrice)
+        put("comboTotalPrice", comboTotalPrice ?: JSONObject.NULL)
+        put("comboUnitCount", comboUnitCount ?: JSONObject.NULL)
         put("category", category)
         put("note", note)
         put("purchased", purchased)
@@ -219,6 +221,8 @@ class ShoppingRepository(context: Context) {
             purchasedQuantity = actualQuantity,
             unit = optString("unit", "un"),
             unitPrice = optDouble("unitPrice", 0.0),
+            comboTotalPrice = if (isNull("comboTotalPrice")) null else optDouble("comboTotalPrice").takeIf { it.isFinite() && it > 0 },
+            comboUnitCount = if (isNull("comboUnitCount")) null else optInt("comboUnitCount").takeIf { it in 2..999 },
             category = optString("category", "Outros"),
             note = optString("note", ""),
             purchased = purchased
