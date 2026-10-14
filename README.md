@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.36+40`
+`1.0.37+41`
 
 ## Identidade técnica
 
@@ -17,6 +17,14 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.37+41 (correção do Build 2)
+
+- A compilação Debug, os testes Kotlin e o Android Lint da versão anterior **passaram** no GitHub Actions; falha ocorreu exclusivamente pela falta dos Secrets da assinatura permanente.
+- Mesmo sem Secrets, o workflow agora disponibiliza o **APK Debug** em Actions > Execução > Artifacts (30 dias).
+- A **GitHub Release** somente será criada quando quatro Secrets de um mesmo conjunto estiverem presentes e válidos. Grupos legados permanecem aceitos, sem misturar senhas e keystore de conjuntos diferentes.
+- Foi reforçada a verificação de assinatura da Release com `apksigner` e adicionada validação de cenários de Secrets para impedir regressões.
+- Identidade técnica, dados, interface, categorias, backup schema 6 e demais funcionalidades continuam inalterados.
 
 ## Atualização 1.0.36+40
 
@@ -132,9 +140,9 @@ Cada lista preserva a data, os itens e os preços registrados. Duplicar uma list
 
 ## Build e Release
 
-O projeto mantém somente `.github/workflows/android-release.yml` como workflow principal. Ele valida versão e código-fonte, compila `:app:assembleRelease`, usa a chave permanente configurada nos Secrets, verifica a assinatura e publica o APK diretamente na GitHub Release.
+O projeto mantém somente `.github/workflows/android-release.yml` como workflow principal. Ele valida a versão e o código-fonte, executa testes unitários, compila `:app:assembleDebug` e verifica `:app:lintDebug`.
 
-O APK de produção fica fora do ZIP do código-fonte e o workflow não usa `actions/upload-artifact` nem gera `source.zip`.
+O **APK Debug** é publicado como Artifacts da execução do GitHub Actions mesmo sem chave de produção. Para a **Release**, é necessária uma keystore válida com os quatro Secrets de um mesmo conjunto. Quando completos, o workflow compila `:app:assembleRelease`, valida a assinatura com `apksigner` e publica no GitHub Releases. O APK Debug **não** é publicado como Release oficial e sua assinatura de teste pode mudar entre execuções. O workflow não gera `source.zip`.
 
 Os nomes de Secrets aceitos estão documentados em `SIGNING-SECRETS.txt`.
 

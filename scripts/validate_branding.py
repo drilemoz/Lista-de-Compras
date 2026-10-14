@@ -42,6 +42,6 @@ main = (app / 'java/com/listadecompras/app/ui/MainActivity.kt').read_text()
 assert 'R.layout.dialog_new_list_choice' in main and 'cardNewEmptyList' in main
 assert 'cardNewFromTemplate' in main
 workflow = (root/'.github/workflows/android-release.yml').read_text()
-assert 'LISTA_COMPRAS_KEYSTORE_PATH' in workflow and 'LISTA_MERCADO_KEYSTORE_BASE64' in workflow
+assert 'LISTA_COMPRAS_KEYSTORE_PATH' in (root/'scripts/resolve_signing.sh').read_text() and 'LISTA_MERCADO_KEYSTORE_BASE64' in workflow
 assert 'Lista-de-Compras-v${VERSION_NAME}.apk' in workflow
-print('Identidade 1.0.36, SQLite categorias, nova lista e backups antigo/novo: OK')
+print('Identidade 1.0.37, SQLite categorias, nova lista e backups antigo/novo: OK')

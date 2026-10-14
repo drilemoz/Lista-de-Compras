@@ -26,14 +26,20 @@ required = {
     "release build": "gradle :app:assembleRelease" in text,
     "APK output": "app/build/outputs/apk/release/app-release.apk" in text,
     "direct release publication": "softprops/action-gh-release@v2" in text,
-    "signature validation": 'keytool -printcert -jarfile "$OUT"' in text,
+    "signature validation": '"$APKSIGNER" verify --min-sdk-version 26 "$OUT"' in text,
+    "debug artifact": "actions/upload-artifact@v4" in text and "if-no-files-found: error" in text,
+    "debug APK integrity": 'unzip -t "$OUT"' in text and 'app/build/outputs/apk/debug/app-debug.apk' in text,
+    "signing script": "bash scripts/resolve_signing.sh" in text,
+    "conditional signed release": text.count("if: steps.signing.outputs.enabled == 'true'") == 3,
+    "signing group isolation": (root / "scripts/resolve_signing.sh").is_file()
+        and "for source in LISTA_COMPRAS LISTA_MERCADO ANDROID KEYSTORE SIGNING" in (root / "scripts/resolve_signing.sh").read_text(),
 }
 failed = [name for name, ok in required.items() if not ok]
 if failed:
     raise SystemExit("Release workflow rule violation: " + ", ".join(failed))
 
-for forbidden in ("actions/upload-artifact", "source.zip", "flutter build", "flutter pub get"):
+for forbidden in ("source.zip", "flutter build", "flutter pub get"):
     if forbidden.lower() in text.lower():
         raise SystemExit(f"Forbidden workflow content: {forbidden}")
 
-print("Workflow OK: legacy CI self-cleanup enabled; signed Release APK built and published directly.")
+print("Workflow OK: CI produces Debug artifact; signed Release is conditional on coherent Secrets and signature verification.")

@@ -1,3 +1,11 @@
+# Validação 1.0.37+41 (correção Build 2)
+
+- Logs de Build 2 analisados: `:app:testDebugUnitTest`, `:app:assembleDebug` e `:app:lintDebug` **BUILD SUCCESSFUL**; falha exclusivamente na etapa "Resolve signing secrets" (`Nenhuma chave permanente encontrada`), com todos os campos de Secrets vazios.
+- Workflow agora disponibiliza APK Debug como Artifact em toda execução aprovada, mesmo sem Secrets de Release.
+- `scripts/resolve_signing.sh` seleciona um conjunto completo de credenciais sem misturá-las; sem Secrets ignora a Release sem falhar o build; keystore inválida falha de forma explícita.
+- `apksigner verify --min-sdk-version 26` substitui a verificação de assinatura baseada em JAR, que não valida corretamente esquemas modernos do Android.
+- A compilação GitHub Actions da nova versão, a Release com Secrets verdadeiros e os testes em dispositivo permanecem pendentes.
+
 # Validação 1.0.36+40
 
 - Novo applicationId `com.listadecompras.app`, namespace e diretórios de fontes/testes atualizados.

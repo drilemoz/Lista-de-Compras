@@ -17,7 +17,7 @@ for file in list((main/'java').rglob('*.kt')) + list((root/'app/src/test').rglob
 identity = json.loads((root/'app_identity.json').read_text())
 assert identity['applicationId'] == 'com.listadecompras.app'
 assert identity['technicalName'] == 'listadecompras'
-assert identity['versionName'] == '1.0.36' and identity['versionCode'] == 40
+assert identity['versionName'] == '1.0.37' and identity['versionCode'] == 41
 
 res = main/'res'
 android = '{http://schemas.android.com/apk/res/android}'

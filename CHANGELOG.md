@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.37+41 (14/10/2026)
+
+- **Correção do Build 2**: o log confirmou `:app:testDebugUnitTest`, `:app:assembleDebug` e `:app:lintDebug` aprovados; falhou apenas a etapa "Resolve signing secrets" porque todos os Secrets de assinatura estavam vazios.
+- O workflow sempre entrega o APK Debug validado em **Actions > Artifacts** (retenção de 30 dias), mesmo quando não houver chave Release.
+- A Release assinada é **condicional** a um conjunto completo e coerente de quatro Secrets, sem misturar credenciais de grupos diferentes e sem publicar APK Debug como Release de produção.
+- O script `scripts/resolve_signing.sh` valida Base64, arquivo de keystore, senha e alias, mantém senhas fora dos outputs e registra apenas o estado da assinatura.
+- A assinatura Android Release passa a ser validada por `apksigner verify`, com suporte aos esquemas modernos do APK.
+- Adicionados testes da assinatura com casos sem Secrets, configuração parcial, chave completa, fallback e chaves inválidas.
+- Identificador `com.listadecompras.app`, funcionalidades, bancos SQLite, schema de backup 6 e compatibilidade com backups antigos foram preservados.
+- **Pendente:** executar o workflow atualizado e, para publicar uma Release assinada, configurar os Secrets reais no repositório.
+
 ## 1.0.36+40 (14/10/2026)
 
 - Identidade técnica alterada para `com.listadecompras.app` (applicationId/namespace/pacotes), nome técnico `listadecompras`, preferências locais e estilos Material.

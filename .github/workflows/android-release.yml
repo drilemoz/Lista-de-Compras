@@ -75,6 +75,9 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      - name: Validate signing fallback and credential isolation
+        run: python3 scripts/test_signing_workflow.py
+
       - name: Setup Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -97,83 +100,67 @@ jobs:
             exit 1
           fi
 
+      # Debug is always installable for testing, including when Release secrets are absent.
+      - name: Prepare Debug APK
+        id: debug_apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          SRC="app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$SRC"
+          OUT="Lista-de-Compras-v${VERSION}-debug.apk"
+          cp "$SRC" "$OUT"
+          unzip -t "$OUT" >/dev/null
+          echo "file=$OUT" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Debug APK to workflow Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lista-de-Compras-${{ github.run_number }}-debug
+          path: ${{ steps.debug_apk.outputs.file }}
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Resolve signing secrets
         id: signing
         shell: bash
         env:
+          KS_LISTA_COMPRAS: ${{ secrets.LISTA_COMPRAS_KEYSTORE_BASE64 }}
+          STORE_LISTA_COMPRAS: ${{ secrets.LISTA_COMPRAS_KEYSTORE_PASSWORD }}
+          ALIAS_LISTA_COMPRAS: ${{ secrets.LISTA_COMPRAS_KEY_ALIAS }}
+          KEY_LISTA_COMPRAS: ${{ secrets.LISTA_COMPRAS_KEY_PASSWORD }}
+
+          KS_LISTA_MERCADO: ${{ secrets.LISTA_MERCADO_KEYSTORE_BASE64 }}
+          STORE_LISTA_MERCADO: ${{ secrets.LISTA_MERCADO_KEYSTORE_PASSWORD }}
+          ALIAS_LISTA_MERCADO: ${{ secrets.LISTA_MERCADO_KEY_ALIAS }}
+          KEY_LISTA_MERCADO: ${{ secrets.LISTA_MERCADO_KEY_PASSWORD }}
+
           KS_ANDROID: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KS_LISTA: ${{ secrets.LISTA_COMPRAS_KEYSTORE_BASE64 || secrets.LISTA_MERCADO_KEYSTORE_BASE64 }}
-          KS_GENERIC: ${{ secrets.KEYSTORE_BASE64 }}
-          KS_SIGNING: ${{ secrets.SIGNING_KEY }}
-
           STORE_ANDROID: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          STORE_LISTA: ${{ secrets.LISTA_COMPRAS_KEYSTORE_PASSWORD || secrets.LISTA_MERCADO_KEYSTORE_PASSWORD }}
-          STORE_GENERIC: ${{ secrets.KEYSTORE_PASSWORD }}
-          STORE_SIGNING: ${{ secrets.SIGNING_STORE_PASSWORD }}
-
           ALIAS_ANDROID: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ALIAS_LISTA: ${{ secrets.LISTA_COMPRAS_KEY_ALIAS || secrets.LISTA_MERCADO_KEY_ALIAS }}
-          ALIAS_GENERIC: ${{ secrets.KEY_ALIAS }}
-          ALIAS_SIGNING: ${{ secrets.SIGNING_KEY_ALIAS }}
-
           KEY_ANDROID: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          KEY_LISTA: ${{ secrets.LISTA_COMPRAS_KEY_PASSWORD || secrets.LISTA_MERCADO_KEY_PASSWORD }}
+
+          KS_GENERIC: ${{ secrets.KEYSTORE_BASE64 }}
+          STORE_GENERIC: ${{ secrets.KEYSTORE_PASSWORD }}
+          ALIAS_GENERIC: ${{ secrets.KEY_ALIAS }}
           KEY_GENERIC: ${{ secrets.KEY_PASSWORD }}
+
+          KS_SIGNING: ${{ secrets.SIGNING_KEY }}
+          STORE_SIGNING: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          ALIAS_SIGNING: ${{ secrets.SIGNING_KEY_ALIAS }}
           KEY_SIGNING: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: |
-          set -euo pipefail
-
-          first_non_empty() {
-            for value in "$@"; do
-              if [ -n "$value" ]; then
-                printf '%s' "$value"
-                return 0
-              fi
-            done
-            return 1
-          }
-
-          KS="$(first_non_empty "$KS_ANDROID" "$KS_LISTA" "$KS_GENERIC" "$KS_SIGNING" || true)"
-          STORE_PASS="$(first_non_empty "$STORE_ANDROID" "$STORE_LISTA" "$STORE_GENERIC" "$STORE_SIGNING" || true)"
-          ALIAS="$(first_non_empty "$ALIAS_ANDROID" "$ALIAS_LISTA" "$ALIAS_GENERIC" "$ALIAS_SIGNING" || true)"
-          KEY_PASS="$(first_non_empty "$KEY_ANDROID" "$KEY_LISTA" "$KEY_GENERIC" "$KEY_SIGNING" || true)"
-
-          if [ -z "$KS" ]; then
-            echo "::error::Nenhuma chave permanente encontrada."
-            exit 1
-          fi
-          if [ -z "$STORE_PASS" ]; then
-            echo "::error::Senha do keystore ausente."
-            exit 1
-          fi
-          if [ -z "$ALIAS" ]; then
-            echo "::error::Alias da chave ausente."
-            exit 1
-          fi
-          if [ -z "$KEY_PASS" ]; then
-            echo "::error::Senha da chave ausente."
-            exit 1
-          fi
-
-          printf '%s' "$KS" | tr -d '\r\n ' | base64 --decode > "$RUNNER_TEMP/lista-de-compras-release.jks"
-          test -s "$RUNNER_TEMP/lista-de-compras-release.jks"
-
-          echo "store_password=$STORE_PASS" >> "$GITHUB_OUTPUT"
-          echo "key_alias=$ALIAS" >> "$GITHUB_OUTPUT"
-          echo "key_password=$KEY_PASS" >> "$GITHUB_OUTPUT"
+        run: bash scripts/resolve_signing.sh
 
       - name: Build signed Release APK
+        if: steps.signing.outputs.enabled == 'true'
         shell: bash
-        env:
-          LISTA_COMPRAS_KEYSTORE_PATH: ${{ runner.temp }}/lista-de-compras-release.jks
-          LISTA_COMPRAS_KEYSTORE_PASSWORD: ${{ steps.signing.outputs.store_password }}
-          LISTA_COMPRAS_KEY_ALIAS: ${{ steps.signing.outputs.key_alias }}
-          LISTA_COMPRAS_KEY_PASSWORD: ${{ steps.signing.outputs.key_password }}
         run: |
           set -euo pipefail
           gradle :app:assembleRelease --stacktrace
 
       - name: Validate signing and rename APK
+        if: steps.signing.outputs.enabled == 'true'
         id: apk
         shell: bash
         run: |
@@ -186,20 +173,46 @@ jobs:
 
           OUT="Lista-de-Compras-v${VERSION_NAME}.apk"
           cp "$SRC" "$OUT"
-
           unzip -t "$OUT" >/dev/null
-          keytool -printcert -jarfile "$OUT" >/dev/null
+
+          # apksigner checks Android APK signing schemes (v2/v3), unlike jar-only checks.
+          APKSIGNER="$(find "${ANDROID_HOME:?}/build-tools" -maxdepth 2 -type f -name apksigner | sort -V | tail -n 1)"
+          test -n "$APKSIGNER"
+          "$APKSIGNER" verify --min-sdk-version 26 "$OUT"
 
           echo "version=$VERSION_NAME" >> "$GITHUB_OUTPUT"
           echo "file=$OUT" >> "$GITHUB_OUTPUT"
 
-      - name: Publish APK directly to GitHub Release
+      - name: Publish signed APK to GitHub Release
+        if: steps.signing.outputs.enabled == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.apk.outputs.version }}
           name: Lista de Compras v${{ steps.apk.outputs.version }}
           target_commitish: ${{ github.sha }}
           files: ${{ steps.apk.outputs.file }}
+          fail_on_unmatched_files: true
           generate_release_notes: true
           overwrite_files: true
           make_latest: true
+
+      - name: Build result summary
+        if: always()
+        shell: bash
+        env:
+          SIGNED: ${{ steps.signing.outputs.enabled }}
+          WHY: ${{ steps.signing.outputs.reason }}
+          DEBUG_FILE: ${{ steps.debug_apk.outputs.file }}
+        run: |
+          {
+            echo '### Lista de Compras: resultado do CI'
+            if [[ -n "$DEBUG_FILE" ]]; then
+              echo "- APK Debug: \`$DEBUG_FILE\` (aba **Artifacts** desta execução)."
+            fi
+            if [[ "$SIGNED" == "true" ]]; then
+              echo '- Assinatura configurada: Release enviada ao GitHub Releases se as etapas posteriores passaram.'
+            else
+              echo "- Release assinada não gerada: Secrets ausentes ou incompletos ($WHY)."
+              echo '- Para publicar Release, configure os 4 Secrets de um mesmo conjunto (ver SIGNING-SECRETS.txt).'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
