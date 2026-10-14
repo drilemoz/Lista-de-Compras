@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="20dp">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Organize seus produtos com uma categoria personalizada."
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutNewCategoryName"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:hint="Nome da categoria">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputNewCategoryName" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:inputType="textCapSentences"
+            android:maxLength="40" android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonChooseCategoryIcon"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" android:minHeight="52dp"
+        android:text="🛒  Escolher ícone" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" android:text="O ícone ficará salvo com a categoria no dispositivo."
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+</LinearLayout>

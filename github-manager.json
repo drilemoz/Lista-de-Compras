@@ -1,16 +1,16 @@
 {
   "product": "Lista de Compras",
-  "name": "listamercado",
+  "name": "listadecompras",
   "displayName": "Lista de Compras",
-  "version": "1.0.35+39",
+  "version": "1.0.36+40",
   "packageFormat": 2,
   "projectType": "android-app",
   "framework": "android-native",
   "language": "kotlin",
   "android": {
-    "applicationId": "com.listamercado.app",
-    "versionName": "1.0.35",
-    "versionCode": 39,
+    "applicationId": "com.listadecompras.app",
+    "versionName": "1.0.36",
+    "versionCode": 40,
     "minSdk": 26,
     "targetSdk": 35,
     "compileSdk": 35

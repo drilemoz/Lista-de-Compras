@@ -3,7 +3,7 @@ import re
 from xml.etree import ElementTree as ET
 
 root = Path(__file__).resolve().parents[1]
-source = root / 'app/src/main/java/com/listamercado/app'
+source = root / 'app/src/main/java/com/listadecompras/app'
 repo = (source / 'data/ShoppingRepository.kt').read_text()
 backup = (source / 'data/BackupRepository.kt').read_text()
 main = (source / 'ui/MainActivity.kt').read_text()
@@ -26,5 +26,5 @@ for folder in ('values','values-night'):
 if int((root/'VERSION').read_text().strip().split('+')[-1]) >= 29:
     for filename in ('styles.xml','dimens.xml'):
         assert (root/'app/src/main/res/values'/filename).exists()
-    assert '@style/Widget.ListaMercado.Card' in (root/'app/src/main/res/layout/item_list.xml').read_text()
+    assert '@style/Widget.ListaCompras.Card' in (root/'app/src/main/res/layout/item_list.xml').read_text()
 print('Validação de correções e recursos XML aprovada')

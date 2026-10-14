@@ -25,7 +25,7 @@
             android:orientation="horizontal">
 
             <com.google.android.material.card.MaterialCardView
-    style="@style/Widget.ListaMercado.Card"
+    style="@style/Widget.ListaCompras.Card"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 app:cardBackgroundColor="?attr/colorSecondaryContainer"

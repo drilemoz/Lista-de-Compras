@@ -52,7 +52,7 @@
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
-    style="@style/Widget.ListaMercado.Card"
+    style="@style/Widget.ListaCompras.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -212,7 +212,7 @@
         android:paddingTop="8dp">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonFinishPurchaseMode"
-            style="@style/Widget.ListaMercado.Button.Filled"
+            style="@style/Widget.ListaCompras.Button.Filled"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginBottom="8dp"

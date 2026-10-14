@@ -134,7 +134,7 @@
             android:textColor="?attr/colorOnSurfaceVariant" />
 
         <com.google.android.material.card.MaterialCardView
-    style="@style/Widget.ListaMercado.Card"
+    style="@style/Widget.ListaCompras.Card"
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:layout_marginStart="14dp"

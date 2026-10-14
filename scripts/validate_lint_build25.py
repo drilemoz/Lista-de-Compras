@@ -32,7 +32,7 @@ for xml in layout_dir.glob('*.xml'):
         count = contents.count('app:tint=')
         assert count >= previous_errors[xml.name], (xml.name, count)
 
-scanner = (root / 'app/src/main/java/com/listamercado/app/ui/BarcodeScannerActivity.kt').read_text()
+scanner = (root / 'app/src/main/java/com/listadecompras/app/ui/BarcodeScannerActivity.kt').read_text()
 assert 'import androidx.camera.core.ExperimentalGetImage' in scanner
 assert re.search(r'@androidx\.annotation\.OptIn\(markerClass = \[ExperimentalGetImage::class\]\)\s+private fun readMediaImage\(imageProxy: ImageProxy\)', scanner)
 assert 'val mediaImage = readMediaImage(imageProxy)' in scanner

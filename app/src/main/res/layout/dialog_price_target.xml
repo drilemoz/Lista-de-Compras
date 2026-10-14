@@ -18,7 +18,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutCatalogPriceTarget"
-        style="@style/Widget.ListaMercado.Field.Filled"
+        style="@style/Widget.ListaCompras.Field.Filled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"

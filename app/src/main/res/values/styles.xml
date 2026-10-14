@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Reusable Material 3 tokens; local screens can override individual properties. -->
-    <style name="Widget.ListaMercado.Card" parent="Widget.Material3.CardView.Outlined">
-        <item name="cardCornerRadius">@dimen/lm_radius_card</item>
+    <style name="Widget.ListaCompras.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardCornerRadius">@dimen/lc_radius_card</item>
         <item name="cardElevation">0dp</item>
         <item name="strokeColor">?attr/colorOutlineVariant</item>
         <item name="strokeWidth">1dp</item>
         <item name="cardBackgroundColor">?attr/colorSurfaceContainerLow</item>
     </style>
-    <style name="Widget.ListaMercado.Card.Highlight" parent="Widget.ListaMercado.Card">
-        <item name="cardCornerRadius">@dimen/lm_radius_hero</item>
+    <style name="Widget.ListaCompras.Card.Highlight" parent="Widget.ListaCompras.Card">
+        <item name="cardCornerRadius">@dimen/lc_radius_hero</item>
         <item name="cardBackgroundColor">?attr/colorPrimaryContainer</item>
         <item name="strokeWidth">0dp</item>
     </style>
-    <style name="Widget.ListaMercado.Card.Subtle" parent="Widget.ListaMercado.Card">
+    <style name="Widget.ListaCompras.Card.Subtle" parent="Widget.ListaCompras.Card">
         <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
         <item name="strokeWidth">0dp</item>
     </style>
-    <style name="Widget.ListaMercado.Button.Filled" parent="Widget.Material3.Button">
-        <item name="cornerRadius">@dimen/lm_radius_button</item>
+    <style name="Widget.ListaCompras.Button.Filled" parent="Widget.Material3.Button">
+        <item name="cornerRadius">@dimen/lc_radius_button</item>
         <item name="android:minHeight">48dp</item>
     </style>
-    <style name="Widget.ListaMercado.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
-        <item name="cornerRadius">@dimen/lm_radius_button</item>
+    <style name="Widget.ListaCompras.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="cornerRadius">@dimen/lc_radius_button</item>
         <item name="android:minHeight">48dp</item>
     </style>
-    <style name="Widget.ListaMercado.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="cornerRadius">@dimen/lm_radius_button</item>
+    <style name="Widget.ListaCompras.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/lc_radius_button</item>
         <item name="android:minHeight">48dp</item>
     </style>
-    <style name="Widget.ListaMercado.Field.Filled" parent="Widget.Material3.TextInputLayout.FilledBox">
-        <item name="boxCornerRadiusTopStart">@dimen/lm_radius_input</item>
-        <item name="boxCornerRadiusTopEnd">@dimen/lm_radius_input</item>
-        <item name="boxCornerRadiusBottomStart">@dimen/lm_radius_input</item>
-        <item name="boxCornerRadiusBottomEnd">@dimen/lm_radius_input</item>
+    <style name="Widget.ListaCompras.Field.Filled" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxCornerRadiusTopStart">@dimen/lc_radius_input</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/lc_radius_input</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/lc_radius_input</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/lc_radius_input</item>
     </style>
-    <style name="Widget.ListaMercado.Field.Outlined" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="boxCornerRadiusTopStart">@dimen/lm_radius_input</item>
-        <item name="boxCornerRadiusTopEnd">@dimen/lm_radius_input</item>
-        <item name="boxCornerRadiusBottomStart">@dimen/lm_radius_input</item>
-        <item name="boxCornerRadiusBottomEnd">@dimen/lm_radius_input</item>
+    <style name="Widget.ListaCompras.Field.Outlined" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/lc_radius_input</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/lc_radius_input</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/lc_radius_input</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/lc_radius_input</item>
     </style>
-    <style name="TextAppearance.ListaMercado.Section" parent="TextAppearance.Material3.TitleMedium">
+    <style name="TextAppearance.ListaCompras.Section" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>

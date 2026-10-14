@@ -1,3 +1,11 @@
+# Validação 1.0.36+40
+
+- Novo applicationId `com.listadecompras.app`, namespace e diretórios de fontes/testes atualizados.
+- Persistência de categorias: SQLite com tabela `categories`, ícones, criação e merge/restauração via backup schema 6.
+- UI Nova lista: bottom sheet com cartões e formulário de nome com chips de sugestões.
+- Backups schema 1–5 aceitos pela assinatura legada; formato novo schema 6.
+- 13 validadores Python aprovados, incluindo categorias/identidade; parser Kotlin PSI aprovou 55 arquivos sem erros de sintaxe; recursos XML analisados. Compilação Gradle/Android e testes em aparelho continuam pendentes.
+
 ## Validação 1.0.35+39 — identidade Lista de Compras
 
 - [x] Código-fonte conferido para localizar nomes públicos antigos e identificadores técnicos persistentes.

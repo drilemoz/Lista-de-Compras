@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_app"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ListaMercado">
+        android:theme="@style/Theme.ListaCompras">
         <activity android:name=".ui.WhatsNewActivity" android:exported="false" android:launchMode="singleTop" />
         <activity android:name=".ui.NearbyMarketsActivity" android:exported="false" />
         <activity android:name=".ui.SettingsActivity" android:exported="false" />

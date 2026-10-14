@@ -71,7 +71,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layoutSearchItems"
-            style="@style/Widget.ListaMercado.Field.Filled"
+            style="@style/Widget.ListaCompras.Field.Filled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -91,7 +91,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.card.MaterialCardView
-            style="@style/Widget.ListaMercado.Card.Highlight"
+            style="@style/Widget.ListaCompras.Card.Highlight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp">
@@ -240,7 +240,7 @@
             android:orientation="horizontal">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonPurchaseMode"
-                style="@style/Widget.ListaMercado.Button.Filled"
+                style="@style/Widget.ListaCompras.Button.Filled"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
@@ -251,7 +251,7 @@
                 app:iconGravity="textStart" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonAddRecurring"
-                style="@style/Widget.ListaMercado.Button.Outlined"
+                style="@style/Widget.ListaCompras.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
@@ -294,7 +294,7 @@
             app:singleSelection="true">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonAll"
-                style="@style/Widget.ListaMercado.Button.Outlined"
+                style="@style/Widget.ListaCompras.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
@@ -303,7 +303,7 @@
                 android:text="Todos" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonPending"
-                style="@style/Widget.ListaMercado.Button.Outlined"
+                style="@style/Widget.ListaCompras.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
@@ -312,7 +312,7 @@
                 android:text="Pendentes" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonPurchased"
-                style="@style/Widget.ListaMercado.Button.Outlined"
+                style="@style/Widget.ListaCompras.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"

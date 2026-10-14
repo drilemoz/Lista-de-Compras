@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 
 root = Path(__file__).resolve().parents[1]
-source = (root / 'app/src/main/java/com/listamercado/app/ui/BarcodeScannerActivity.kt').read_text(encoding='utf-8')
+source = (root / 'app/src/main/java/com/listadecompras/app/ui/BarcodeScannerActivity.kt').read_text(encoding='utf-8')
 assert 'import androidx.camera.core.ExperimentalGetImage' in source
 assert 'import androidx.camera.core.ImageProxy' in source
 access = re.search(r'^\s*private fun readMediaImage\(imageProxy: ImageProxy\): android\.media\.Image\? = imageProxy\.image', source, re.M)

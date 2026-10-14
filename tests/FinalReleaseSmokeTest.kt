@@ -1,7 +1,7 @@
-package com.listamercado.app.ui
+package com.listadecompras.app.ui
 
-import com.listamercado.app.model.ShoppingItem
-import com.listamercado.app.model.ShoppingList
+import com.listadecompras.app.model.ShoppingItem
+import com.listadecompras.app.model.ShoppingList
 
 fun main() {
     val allowed = listOf(MapResourcePolicy.LOCAL_MAP,

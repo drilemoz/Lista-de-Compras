@@ -4,20 +4,29 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.35+39`
+`1.0.36+40`
 
 ## Identidade técnica
 
 - Nome público: Lista de Compras
-- Nome técnico: listamercado
-- Application ID: `com.listamercado.app`
+- Nome técnico: `listadecompras`
+- **Application ID: `com.listadecompras.app`**
+- Namespace Kotlin: `com.listadecompras.app` (fontes e testes movidos)
 - Android mínimo: 8.0 (API 26)
 - compileSdk/targetSdk: 35
-- Kotlin: 2.0.21
-- Java/JVM: 17
-- Android Gradle Plugin: 8.7.3
-- Interface: XML tradicional, sem Jetpack Compose
-- Compatibilidade: o `applicationId` e o nome técnico `listamercado` permanecem iguais para permitir atualização sobre versões anteriores e preservar os dados.
+- Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
+- UI: Material 3 com XML e BottomSheetDialog
+- **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.36+40
+
+- Renomeados applicationId, namespace/pacotes Kotlin, nomes técnicos, preferências, estilos e recursos técnicos para **Lista de Compras**.
+- Categorias padrão e personalizadas com nome/emoji persistidos em SQLite (`lista_de_compras_categories.db`), duplicatas ignoradas sem distinguir maiúsculas, ícones no seletor e etiquetas de itens.
+- Novo botão `+ Nova` no cadastro de item abre formulário de categoria com seletor de 20 ícones. Categorias persistem mesmo sem itens associados.
+- Novo fluxo de `Nova lista`: BottomSheet Material 3 com cartões para lista vazia ou modelo; formulário com sugestões de nomes e CTA destacado.
+- Backups no formato `lista-de-compras-backup`, schema 6, exportam categorias; importador continua aceitando `meu-supermercado-backup` schemas 1 a 5, recuperando nomes de categorias dos itens quando possível.
+- Segredos de assinatura aceitam `LISTA_COMPRAS_*` com fallback para `LISTA_MERCADO_*` já existentes. Não é preciso alterar a keystore usada anteriormente para compilar uma assinatura válida.
+- CI inclui `scripts/validate_categories_and_identity.py` para validar identidade, schema SQLite e recursos XML. Compilação, Lint e testes no Android ainda precisam ser confirmados antes de disponibilização de APK.
 
 ## Atualização 1.0.35+39 (novo nome público)
 

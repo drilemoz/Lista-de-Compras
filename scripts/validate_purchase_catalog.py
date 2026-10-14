@@ -4,7 +4,7 @@ from xml.etree import ElementTree as ET
 
 root = Path(__file__).resolve().parents[1]
 version = int((root/'VERSION').read_text().strip().split('+')[1])
-src = root/'app/src/main/java/com/listamercado/app/ui'
+src = root/'app/src/main/java/com/listadecompras/app/ui'
 layouts = root/'app/src/main/res/layout'
 android = '{http://schemas.android.com/apk/res/android}'
 

@@ -56,6 +56,7 @@ jobs:
         run: |
           python3 scripts/validate_version.py
           python3 scripts/validate_branding.py
+          python3 scripts/validate_categories_and_identity.py
           python3 scripts/validate_source.py
           python3 scripts/validate_workflow.py
           python3 scripts/validate_repaginacao.py
@@ -101,22 +102,22 @@ jobs:
         shell: bash
         env:
           KS_ANDROID: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KS_LISTA: ${{ secrets.LISTA_MERCADO_KEYSTORE_BASE64 }}
+          KS_LISTA: ${{ secrets.LISTA_COMPRAS_KEYSTORE_BASE64 || secrets.LISTA_MERCADO_KEYSTORE_BASE64 }}
           KS_GENERIC: ${{ secrets.KEYSTORE_BASE64 }}
           KS_SIGNING: ${{ secrets.SIGNING_KEY }}
 
           STORE_ANDROID: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          STORE_LISTA: ${{ secrets.LISTA_MERCADO_KEYSTORE_PASSWORD }}
+          STORE_LISTA: ${{ secrets.LISTA_COMPRAS_KEYSTORE_PASSWORD || secrets.LISTA_MERCADO_KEYSTORE_PASSWORD }}
           STORE_GENERIC: ${{ secrets.KEYSTORE_PASSWORD }}
           STORE_SIGNING: ${{ secrets.SIGNING_STORE_PASSWORD }}
 
           ALIAS_ANDROID: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ALIAS_LISTA: ${{ secrets.LISTA_MERCADO_KEY_ALIAS }}
+          ALIAS_LISTA: ${{ secrets.LISTA_COMPRAS_KEY_ALIAS || secrets.LISTA_MERCADO_KEY_ALIAS }}
           ALIAS_GENERIC: ${{ secrets.KEY_ALIAS }}
           ALIAS_SIGNING: ${{ secrets.SIGNING_KEY_ALIAS }}
 
           KEY_ANDROID: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          KEY_LISTA: ${{ secrets.LISTA_MERCADO_KEY_PASSWORD }}
+          KEY_LISTA: ${{ secrets.LISTA_COMPRAS_KEY_PASSWORD || secrets.LISTA_MERCADO_KEY_PASSWORD }}
           KEY_GENERIC: ${{ secrets.KEY_PASSWORD }}
           KEY_SIGNING: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: |
@@ -164,10 +165,10 @@ jobs:
       - name: Build signed Release APK
         shell: bash
         env:
-          LISTA_MERCADO_KEYSTORE_PATH: ${{ runner.temp }}/lista-de-compras-release.jks
-          LISTA_MERCADO_KEYSTORE_PASSWORD: ${{ steps.signing.outputs.store_password }}
-          LISTA_MERCADO_KEY_ALIAS: ${{ steps.signing.outputs.key_alias }}
-          LISTA_MERCADO_KEY_PASSWORD: ${{ steps.signing.outputs.key_password }}
+          LISTA_COMPRAS_KEYSTORE_PATH: ${{ runner.temp }}/lista-de-compras-release.jks
+          LISTA_COMPRAS_KEYSTORE_PASSWORD: ${{ steps.signing.outputs.store_password }}
+          LISTA_COMPRAS_KEY_ALIAS: ${{ steps.signing.outputs.key_alias }}
+          LISTA_COMPRAS_KEY_PASSWORD: ${{ steps.signing.outputs.key_password }}
         run: |
           set -euo pipefail
           gradle :app:assembleRelease --stacktrace

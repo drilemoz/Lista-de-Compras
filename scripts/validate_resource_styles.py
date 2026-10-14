@@ -1,7 +1,7 @@
 """Resource style reference / inheritance checks for pre-Gradle validation.
 
-Android AAPT2 infers Widget.ListaMercado as the parent of an undirected
-Widget.ListaMercado.Card declaration, causing processReleaseResources to fail.
+Android AAPT2 infers Widget.ListaCompras as the parent of an undirected
+Widget.ListaCompras.Card declaration, causing processReleaseResources to fail.
 """
 from pathlib import Path
 import re
@@ -41,9 +41,9 @@ def validate_styles():
     unresolved = sorted(ref for ref in refs if ref not in definitions and not ref.startswith(("Widget.Material3.", "TextAppearance.Material3.", "Theme.Material3.", "Widget.MaterialComponents.", "ThemeOverlay.Material3.")))
     if unresolved:
         raise AssertionError(f"Undefined application styles: {unresolved}")
-    assert definitions.get("Widget.ListaMercado.Card"), "Missing base Card style"
-    styles = ET.parse(definitions["Widget.ListaMercado.Card"])
-    card = next(el for el in styles.findall("style") if el.get("name") == "Widget.ListaMercado.Card")
+    assert definitions.get("Widget.ListaCompras.Card"), "Missing base Card style"
+    styles = ET.parse(definitions["Widget.ListaCompras.Card"])
+    card = next(el for el in styles.findall("style") if el.get("name") == "Widget.ListaCompras.Card")
     assert card.get("parent") == "Widget.Material3.CardView.Outlined", "Base Material card must have an explicit parent"
     print(f"Resource styles OK: {len(definitions)} definitions, {len(refs)} references")
 

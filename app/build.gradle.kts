@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.listamercado.app"
+    namespace = "com.listadecompras.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.listamercado.app"
+        applicationId = "com.listadecompras.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 39
-        versionName = "1.0.35"
+        versionCode = 40
+        versionName = "1.0.36"
     }
 
     buildFeatures {
@@ -21,12 +21,12 @@ android {
 
     signingConfigs {
         create("release") {
-            val ks = System.getenv("LISTA_MERCADO_KEYSTORE_PATH")
+            val ks = System.getenv("LISTA_COMPRAS_KEYSTORE_PATH")
             if (!ks.isNullOrBlank()) {
                 storeFile = file(ks)
-                storePassword = System.getenv("LISTA_MERCADO_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("LISTA_MERCADO_KEY_ALIAS")
-                keyPassword = System.getenv("LISTA_MERCADO_KEY_PASSWORD")
+                storePassword = System.getenv("LISTA_COMPRAS_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("LISTA_COMPRAS_KEY_ALIAS")
+                keyPassword = System.getenv("LISTA_COMPRAS_KEY_PASSWORD")
             }
         }
     }
@@ -34,7 +34,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            val ks = System.getenv("LISTA_MERCADO_KEYSTORE_PATH")
+            val ks = System.getenv("LISTA_COMPRAS_KEYSTORE_PATH")
             if (!ks.isNullOrBlank()) signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

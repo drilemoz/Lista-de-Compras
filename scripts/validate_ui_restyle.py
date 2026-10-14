@@ -4,7 +4,7 @@ from xml.etree import ElementTree as ET
 
 root=Path(__file__).resolve().parents[1]
 res=root/'app/src/main/res'
-source=root/'app/src/main/java/com/listamercado/app/ui'
+source=root/'app/src/main/java/com/listadecompras/app/ui'
 android='{http://schemas.android.com/apk/res/android}'
 
 # Parse all resources and catch duplicate ID declarations in the same layout.
@@ -27,9 +27,9 @@ if not {'bottomNavigation','textHomeSummary','textDashboardStats','textListCount
     raise SystemExit('Home IDs missing')
 if not {'navLists','navCatalog','navPrices','navMarkets'}.issubset(menu):
     raise SystemExit('Bottom menu entries missing')
-assert referenced('MainActivity.kt') <= home | menu, referenced('MainActivity.kt') - home - menu
+assert referenced('MainActivity.kt') <= home | menu | ids('layout/dialog_new_list_choice.xml'), referenced('MainActivity.kt') - home - menu - ids('layout/dialog_new_list_choice.xml')
 assert 'bottomBar = findViewById(R.id.bottomNavigation)' in (source/'MainActivity.kt').read_text()
-assert 'bottomBar?.let' in (root/'app/src/main/java/com/listamercado/app/util/InsetsHelper.kt').read_text()
+assert 'bottomBar?.let' in (root/'app/src/main/java/com/listadecompras/app/util/InsetsHelper.kt').read_text()
 assert not ({'buttonCompare','buttonNearbyMarkets'} & referenced('MainActivity.kt'))
 
 version=int((root/'VERSION').read_text().split('+')[-1])

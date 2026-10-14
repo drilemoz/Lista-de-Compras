@@ -64,7 +64,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layoutSearchLists"
-            style="@style/Widget.ListaMercado.Field.Filled"
+            style="@style/Widget.ListaCompras.Field.Filled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -86,7 +86,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.card.MaterialCardView
-            style="@style/Widget.ListaMercado.Card.Highlight"
+            style="@style/Widget.ListaCompras.Card.Highlight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

@@ -47,7 +47,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonUseTemplate"
-                style="@style/Widget.ListaMercado.Button.Tonal"
+                style="@style/Widget.ListaCompras.Button.Tonal"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"

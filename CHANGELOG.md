@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.36+40 (14/10/2026)
+
+- Identidade técnica alterada para `com.listadecompras.app` (applicationId/namespace/pacotes), nome técnico `listadecompras`, preferências locais e estilos Material.
+- Novo catálogo de categorias persistente em SQLite com ícones: seleção visual, cadastro personalizado, prevenção de duplicidade e exibição nos itens e catálogo.
+- Criação de listas redesenhada: escolha visual entre começar do zero/modelo, formulário atualizado e sugestões de nome.
+- Backup schema 6 inclui as categorias e mantém leitura dos backups legados; categorias antigas podem ser recuperadas dos produtos e listas exportados.
+- Workflow aceita Secrets novos e antigos de assinatura. Importante: mudar applicationId instala outro app; dados não são migrados automaticamente, usar exportação/importação JSON.
+- Análises estáticas e XML; compilação Android e teste no aparelho pendentes.
+
 ## 1.0.35+39 — 2026-10-14
 
 - **Nova marca pública:** aplicativo renomeado para **Lista de Compras** no launcher, tela Sobre, configurações de projeto e metadados.

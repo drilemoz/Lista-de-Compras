@@ -6,8 +6,8 @@ from pathlib import Path
 import re
 
 root = Path(__file__).resolve().parents[1]
-source = (root / 'app/src/main/java/com/listamercado/app/ui/LocationAccess.kt').read_text(encoding='utf-8')
-activity = (root / 'app/src/main/java/com/listamercado/app/ui/NearbyMarketsActivity.kt').read_text(encoding='utf-8')
+source = (root / 'app/src/main/java/com/listadecompras/app/ui/LocationAccess.kt').read_text(encoding='utf-8')
+activity = (root / 'app/src/main/java/com/listadecompras/app/ui/NearbyMarketsActivity.kt').read_text(encoding='utf-8')
 workflow = (root / '.github/workflows/android-release.yml').read_text(encoding='utf-8')
 
 for name, api in (

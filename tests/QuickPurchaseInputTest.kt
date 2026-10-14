@@ -1,4 +1,4 @@
-package com.listamercado.app.ui
+package com.listadecompras.app.ui
 
 fun main() {
     check(QuickPurchaseInput.parseNonNegative(null) == null)

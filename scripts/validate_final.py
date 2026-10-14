@@ -1,7 +1,7 @@
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
-ui = root / 'app/src/main/java/com/listamercado/app/ui'
+ui = root / 'app/src/main/java/com/listadecompras/app/ui'
 assets = root / 'app/src/main/assets/nearby_markets_map.html'
 for adapter in ('ShoppingListAdapter.kt','ShoppingItemAdapter.kt','CatalogProductAdapter.kt','ComparisonAdapter.kt'):
     source = (ui / adapter).read_text()
@@ -27,6 +27,6 @@ workflow = (root / '.github/workflows/android-release.yml').read_text()
 for stage in (':app:testDebugUnitTest', ':app:assembleDebug', ':app:lintDebug', 'scripts/validate_final.py'):
     assert stage in workflow, stage
 for test_file in ('ui/MapResourcePolicyTest.kt','ui/QuickPurchaseInputUnitTest.kt','model/ShoppingListTotalsTest.kt'):
-    assert (root / 'app/src/test/java/com/listamercado/app' / test_file).is_file(), test_file
+    assert (root / 'app/src/test/java/com/listadecompras/app' / test_file).is_file(), test_file
 # A versão é validada por scripts/validate_version.py; esta validação verifica regressões específicas.
 print('Final UI / map security / CI regression validation OK')
