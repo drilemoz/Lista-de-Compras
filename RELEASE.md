@@ -1,12 +1,10 @@
-# Lista de Compras 1.0.39+43
+# Lista de Compras 1.0.40+44
 
-- Redesenho do editor de produtos com cabeçalho e botões fixos; menos rolagem, campo opcional recolhível.
-- Escolha de ícones em grade e edição de ícones de categorias existentes, persistidos em SQLite.
-- Calculadora para promoções com várias unidades: 2 por R$ 14,79 indica R$ 7,40 por unidade, enquanto o subtotal preserva R$ 14,79.
-- Campo de nome do produto com espaçamento interno maior para separar melhor rótulo e texto digitado.
-- Biblioteca de ícones ampliada com opções para tecnologia, carros, bicicleta, ferramentas, roupas, games, escritório e outras áreas.
-- Diálogo de ícones permanece em grade e agora é rolável para acomodar as novas opções.
-- Dados da promoção seguem gravados em listas, modelos e backup JSON schema 7, com importação dos schemas anteriores; CSV com colunas de combo.
-- Compatível com applicationId e Secrets da versão anterior.
+- Cartões das listas principais redesenhados para ficarem mais modernos, com emoji contextual, estado da compra e resumo mais legível.
+- Criação/renomeação de listas com sugestões rápidas alinhadas em grade 2x2, corrigindo o desalinhamento dos atalhos.
+- Busca de mercados ampliada para supermercados, mercearias, hortifrutis, conveniências, atacados e feiras/marketplaces no OpenStreetMap.
+- Mapa Leaflet/OpenStreetMap estabilizado com ajuste automático de layout e marcadores vetoriais, melhorando a visualização e o carregamento.
+- Tela de mercados agora mostra contagem de resultados, vazio contextual e tipo do estabelecimento.
+- Favoritos, associação entre mercado e lista, cache recente e demais dados existentes foram preservados.
 
-**A validar:** compilar o APK em GitHub Actions e testar o formulário e cálculos num aparelho Android.
+**A validar:** compilar o APK em GitHub Actions e testar em aparelho Android as telas de listas e mercados próximos.

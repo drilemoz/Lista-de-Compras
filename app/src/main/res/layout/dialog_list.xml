@@ -1,76 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/sheetListRoot" android:layout_width="match_parent"
-    android:layout_height="wrap_content" android:orientation="vertical"
-    android:clipToPadding="false" android:paddingStart="22dp"
-    android:paddingTop="12dp" android:paddingEnd="22dp" android:paddingBottom="28dp">
-    <View android:layout_width="44dp" android:layout_height="4dp"
-        android:layout_gravity="center_horizontal" android:background="?attr/colorOutlineVariant" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="22dp">
-        <TextView android:layout_width="58dp" android:layout_height="58dp"
-            android:gravity="center" android:text="🛍️" android:textSize="30sp"
+    android:id="@+id/sheetListRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:clipToPadding="false"
+    android:paddingStart="22dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="22dp"
+    android:paddingBottom="28dp">
+
+    <View
+        android:layout_width="44dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="?attr/colorOutlineVariant" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="22dp">
+
+        <TextView
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:gravity="center"
+            android:text="🛍️"
+            android:textSize="30sp"
             android:background="@drawable/bg_list_sheet_icon" />
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
-            <TextView android:id="@+id/textListSheetTitle" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:textStyle="bold"
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textListSheetTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
-            <TextView android:id="@+id/textListSheetSubtitle" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_marginTop="3dp"
+
+            <TextView
+                android:id="@+id/textListSheetSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
         </LinearLayout>
-        <ImageButton android:id="@+id/buttonCloseListSheet" android:layout_width="48dp"
-            android:layout_height="48dp" android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Fechar" android:padding="12dp" android:src="@drawable/ic_close" />
+
+        <ImageButton
+            android:id="@+id/buttonCloseListSheet"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Fechar"
+            android:padding="12dp"
+            android:src="@drawable/ic_close" />
     </LinearLayout>
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="26dp" android:layout_marginBottom="10dp"
-        android:text="NOME DA LISTA" android:textColor="?attr/colorPrimary"
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:layout_marginBottom="10dp"
+        android:text="NOME DA LISTA"
+        android:textColor="?attr/colorPrimary"
         android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutListName" style="@style/Widget.ListaCompras.Field.Outlined"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:id="@+id/layoutListName"
+        style="@style/Widget.ListaCompras.Field.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:hint="Ex.: Compras da semana"
-        app:boxCornerRadiusTopStart="20dp" app:boxCornerRadiusTopEnd="20dp"
-        app:boxCornerRadiusBottomStart="20dp" app:boxCornerRadiusBottomEnd="20dp"
-        app:counterEnabled="true" app:counterMaxLength="60">
+        app:boxCornerRadiusTopStart="20dp"
+        app:boxCornerRadiusTopEnd="20dp"
+        app:boxCornerRadiusBottomStart="20dp"
+        app:boxCornerRadiusBottomEnd="20dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="60">
+
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/inputListName" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:inputType="textCapSentences"
-            android:maxLength="60" android:imeOptions="actionDone" android:maxLines="1" />
+            android:id="@+id/inputListName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
+            android:maxLength="60"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
-    <LinearLayout android:id="@+id/layoutListSuggestions" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:orientation="vertical"
+
+    <LinearLayout
+        android:id="@+id/layoutListSuggestions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_marginTop="18dp">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="SUGESTÕES RÁPIDAS" android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SUGESTÕES RÁPIDAS"
+            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
             android:textColor="?attr/colorOnSurfaceVariant" />
-        <com.google.android.material.chip.ChipGroup android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:layout_marginTop="8dp"
-            app:chipSpacingHorizontal="8dp" app:chipSpacingVertical="6dp">
-            <com.google.android.material.chip.Chip android:id="@+id/chipListWeek"
-                style="@style/Widget.Material3.Chip.Suggestion" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="🛒 Semana" />
-            <com.google.android.material.chip.Chip android:id="@+id/chipListFair"
-                style="@style/Widget.Material3.Chip.Suggestion" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="🥕 Feira" />
-            <com.google.android.material.chip.Chip android:id="@+id/chipListPharmacy"
-                style="@style/Widget.Material3.Chip.Suggestion" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="💊 Farmácia" />
-            <com.google.android.material.chip.Chip android:id="@+id/chipListTrip"
-                style="@style/Widget.Material3.Chip.Suggestion" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="🚲 Viagem" />
-        </com.google.android.material.chip.ChipGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSuggestionWeek"
+                style="@style/Widget.ListaCompras.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="54dp"
+                android:text="🛒  Semana" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="1dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSuggestionFair"
+                style="@style/Widget.ListaCompras.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="54dp"
+                android:text="🥕  Feira" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSuggestionPharmacy"
+                style="@style/Widget.ListaCompras.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="54dp"
+                android:text="💊  Farmácia" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="1dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSuggestionTrip"
+                style="@style/Widget.ListaCompras.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="54dp"
+                android:text="🚲  Viagem" />
+        </LinearLayout>
     </LinearLayout>
-    <com.google.android.material.button.MaterialButton android:id="@+id/buttonSaveList"
-        style="@style/Widget.ListaCompras.Button.Filled" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="26dp"
-        android:minHeight="56dp" android:text="Criar lista" />
-    <com.google.android.material.button.MaterialButton android:id="@+id/buttonCancelList"
-        style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="4dp"
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonSaveList"
+        style="@style/Widget.ListaCompras.Button.Filled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:minHeight="56dp"
+        android:text="Criar lista" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonCancelList"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:text="Cancelar" />
 </LinearLayout>

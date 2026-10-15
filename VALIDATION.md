@@ -1,7 +1,7 @@
-# Validação 1.0.39+43
+# Validação 1.0.40+44
 
-- Conferir `scripts/validate_price_split_and_ui.py` para o contrato de calculadora, layouts e serializadores.
-- Conferir `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug` e assinatura Release no GitHub Actions.
-- Testes JUnit `PriceSplitHelperTest` incluem ofertas com fração de centavo, quantidade parcial, preços por kg e regressão de itens sem oferta.
-- UI manual: teclado e IME, cabeçalho e ação salvar fixos, 20 emojis em grade, alteração de categoria padrão e personalizada, recuperação de combo na edição e restauração JSON antigo/novo.
+- Executados localmente com sucesso: `scripts/validate_ui_restyle.py`, `scripts/validate_purchase_catalog.py`, `scripts/validate_branding.py` e `scripts/validate_final.py`.
+- Conferir no GitHub Actions: `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug` e assinatura Release, como nas versões anteriores.
+- UI manual recomendada: cartões da home, criação/renomeação de listas com sugestões 2x2, busca de mercados por 5/10/20/30/50 km, favoritos, criação de lista a partir do mercado, cache offline e reabertura da tela.
+- Validar em aparelho o mapa Leaflet/OpenStreetMap, especialmente o recálculo de layout após abrir a tela e após mudar o raio.
 - Sem build Gradle Android completo local por ausência de wrapper/SDK neste ambiente; CI precisa confirmar.

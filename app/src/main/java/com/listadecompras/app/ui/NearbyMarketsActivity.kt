@@ -3,6 +3,7 @@ package com.listadecompras.app.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -44,6 +45,9 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
     private lateinit var status: TextView
     private lateinit var progress: CircularProgressIndicator
     private lateinit var radiusGroup: ChipGroup
+    private lateinit var resultsTitle: TextView
+    private lateinit var favoriteHint: TextView
+    private lateinit var emptyText: TextView
     private lateinit var adapter: NearbyMarketAdapter
     private lateinit var locationManager: LocationManager
     private lateinit var locationAccess: LocationAccess
@@ -64,6 +68,9 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         status = findViewById(R.id.textMarketStatus)
         progress = findViewById(R.id.progressMarkets)
         radiusGroup = findViewById(R.id.groupMarketRadius)
+        resultsTitle = findViewById(R.id.textMarketResultsTitle)
+        favoriteHint = findViewById(R.id.textMarketFavoriteHint)
+        emptyText = findViewById(R.id.textEmptyMarkets)
         webView = findViewById(R.id.webMarkets)
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         locationAccess = LocationAccess(this, locationManager, this)
@@ -96,6 +103,7 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         super.onResume()
         if (baseMarkets.isNotEmpty()) renderMarkets(baseMarkets)
     }
+
     private fun setupRadiusSelector() {
         radiusGroup.check(chipIdForRadius(selectedRadiusMeters))
         radiusGroup.setOnCheckedStateChangeListener { _, checkedIds ->
@@ -107,10 +115,14 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
             pendingLocation?.let { loadMarkets(it) }
         }
     }
+
     @Suppress("SetJavaScriptEnabled")
     private fun configureMap() {
+        webView.setBackgroundColor(Color.TRANSPARENT)
+        webView.overScrollMode = View.OVER_SCROLL_NEVER
         webView.settings.javaScriptEnabled = true
-        webView.settings.domStorageEnabled = false
+        webView.settings.domStorageEnabled = true
+        webView.settings.loadsImagesAutomatically = true
         webView.settings.allowFileAccessFromFileURLs = false
         webView.settings.allowUniversalAccessFromFileURLs = false
         webView.settings.allowContentAccess = false
@@ -118,20 +130,24 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         webView.settings.setSupportMultipleWindows(false)
         webView.settings.userAgentString = webView.settings.userAgentString +
             " ListaDeCompras/${com.listadecompras.app.BuildConfig.VERSION_NAME}"
-        // A interface JavaScript so deve executar na pagina local controlada pelo app.
         webView.addJavascriptInterface(MapBridge(), "AndroidMarket")
         webView.webViewClient = MapWebViewClient { trusted ->
             mapReady = trusted
             if (trusted) {
+                setMapState("Mapa pronto", false)
                 pendingLocation?.let(::renderUserLocation)
                 renderMap(displayedMarkets)
+                refreshMapSoon()
             }
         }
+        setMapState("Carregando mapa…", true)
         webView.loadUrl(MapResourcePolicy.LOCAL_MAP)
     }
+
     private fun requestLocation() {
         progress.visibility = View.VISIBLE
         status.text = "Obtendo sua localização…"
+        setMapState("Obtendo sua localização…", true)
         if (!hasLocationPermission()) {
             ActivityCompat.requestPermissions(
                 this,
@@ -142,13 +158,16 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         }
         startLocationLookup()
     }
+
     private fun hasLocationPermission(): Boolean =
         ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
     private fun startLocationLookup() {
         if (!hasLocationPermission()) {
             progress.visibility = View.GONE
             status.text = "Permissão de localização necessária para encontrar mercados próximos."
+            setMapState("Permissão de localização necessária.", false)
             return
         }
         val providers = listOf(LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER)
@@ -161,14 +180,14 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         if (providers.isEmpty()) {
             progress.visibility = View.GONE
             status.text = "Ative a localização do celular para procurar mercados próximos."
+            setMapState("Ative a localização do aparelho.", false)
             return
         }
-        // Network e GPS podem exigir permissões diferentes dependendo do aparelho.
-        // Checamos cada chamada e capturamos a revogação entre a checagem e o uso.
         val registered = providers.count(locationAccess::requestProviderUpdatesSafely)
         if (registered == 0) {
             progress.visibility = View.GONE
             status.text = "Não foi possível acessar a localização. Confira as permissões e tente novamente."
+            setMapState("Não foi possível obter a localização.", false)
         }
     }
 
@@ -178,11 +197,15 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         if (mapReady) renderUserLocation(location)
         loadMarkets(location)
     }
+
     private fun renderUserLocation(location: Location) {
         webView.evaluateJavascript("setUserLocation(${location.latitude},${location.longitude})", null)
+        refreshMapSoon()
     }
+
     private fun loadMarkets(location: Location) {
         progress.visibility = View.VISIBLE
+        setMapState("Buscando mercados no mapa…", true)
         val cached = marketPreferences.loadCache(location, selectedRadiusMeters)
         val cachedMarkets = cached?.let { selectCachedMarkets(it.markets, selectedRadiusMeters, it.radiusMeters) }
         if (cached != null && cachedMarkets != null) {
@@ -190,16 +213,18 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
             renderMarkets(baseMarkets)
             status.text = "Exibindo resultados recentes enquanto atualiza…"
         } else {
-            status.text = "Procurando mercados próximos…"
+            status.text = "Procurando supermercados, mercearias e atacados próximos…"
         }
         if (!hasInternetConnection()) {
             progress.visibility = View.GONE
             if (cached != null) {
                 status.text = "Sem internet. Exibindo mercados do cache recente."
+                setMapState("Sem internet. Exibindo resultados recentes.", false)
             } else {
                 baseMarkets = emptyList()
                 renderMarkets(baseMarkets)
                 status.text = "Sem internet e sem resultados recentes em cache. Sua localização foi obtida normalmente."
+                setMapState("Sem internet para buscar mercados agora.", false)
             }
             return
         }
@@ -214,36 +239,41 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
                     }
                     renderMarkets(baseMarkets)
                     updateSuccessStatus(searchResult)
+                    setMapState(if (baseMarkets.isEmpty()) "Nenhum mercado encontrado no raio atual." else "Mapa atualizado", false)
                 }.onFailure {
                     if (cached != null && cachedMarkets != null) {
                         baseMarkets = cachedMarkets
                         renderMarkets(baseMarkets)
                         status.text = if (hasInternetConnection()) {
-                            "Overpass indisponível agora. Exibindo mercados do cache recente."
+                            "Serviço de mercados indisponível agora. Exibindo o cache recente."
                         } else {
                             "Sem internet. Exibindo mercados do cache recente."
                         }
+                        setMapState("Mostrando resultados recentes salvos.", false)
                     } else {
                         baseMarkets = emptyList()
                         renderMarkets(baseMarkets)
                         status.text = if (hasInternetConnection()) {
-                            "O serviço de mercados está temporariamente indisponível. Sua localização não foi considerada inválida."
+                            "O serviço de mercados está temporariamente indisponível."
                         } else {
-                            "Sem internet e sem resultados recentes em cache. Sua localização foi obtida normalmente."
+                            "Sem internet e sem resultados recentes em cache."
                         }
+                        setMapState("Não foi possível atualizar o mapa agora.", false)
                     }
                 }
             }
         }
     }
+
     private fun updateSuccessStatus(result: MarketSearchResult) {
         val radiusKm = result.radiusMeters / 1000
         status.text = when (result.markets.size) {
-            0 -> "Nenhum mercado cadastrado no OpenStreetMap em até $radiusKm km. Sua localização foi obtida normalmente."
+            0 -> "Nenhum mercado cadastrado no OpenStreetMap em até $radiusKm km. Tente ampliar o raio."
             1 -> "1 mercado encontrado em até $radiusKm km."
             else -> "${result.markets.size} mercados encontrados em até $radiusKm km."
         }
     }
+
     private fun selectCachedMarkets(markets: List<NearbyMarket>, requestedRadius: Int, cachedRadius: Int): List<NearbyMarket> {
         val requested = markets.filter { it.distanceMeters <= requestedRadius }
         return if (requested.size >= MIN_RESULTS_BEFORE_STOP || cachedRadius <= requestedRadius) {
@@ -252,24 +282,31 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
             markets.filter { it.distanceMeters <= cachedRadius }
         }
     }
+
     private fun queryMarketsAdaptive(location: Location, requestedRadius: Int): MarketSearchResult {
         val steps = RADIUS_STEPS_METERS.filter { it >= requestedRadius }.ifEmpty { listOf(requestedRadius) }
         var lastResult = emptyList<NearbyMarket>()
         var lastRadius = steps.first()
         for (radius in steps) {
             lastRadius = radius
-            runOnUiThread { status.text = "Procurando em até ${radius / 1000} km…" }
+            runOnUiThread {
+                status.text = "Procurando mercados em até ${radius / 1000} km…"
+                setMapState("Procurando em até ${radius / 1000} km…", true)
+            }
             lastResult = queryMarkets(location, radius)
             if (lastResult.size >= MIN_RESULTS_BEFORE_STOP || radius == RADIUS_STEPS_METERS.last()) break
         }
         return MarketSearchResult(lastResult, lastRadius)
     }
+
     private fun queryMarkets(location: Location, radiusMeters: Int): List<NearbyMarket> {
         val query = """
-            [out:json][timeout:30];
+            [out:json][timeout:40];
             (
-              nwr["shop"="supermarket"](around:$radiusMeters,${location.latitude},${location.longitude});
-              nwr["shop"="convenience"](around:$radiusMeters,${location.latitude},${location.longitude});
+              nwr["shop"~"^(supermarket|convenience|grocery|greengrocer|wholesale|department_store)$"](around:$radiusMeters,${location.latitude},${location.longitude});
+              nwr["amenity"="marketplace"](around:$radiusMeters,${location.latitude},${location.longitude});
+              nwr["name"~"mercado|supermercado|mercearia|minimercado|atacado|sacolao|sacolão|hortifruti|hortifrúti|conveniencia|conveniência|emporio|empório|armazem|armazém",i](around:$radiusMeters,${location.latitude},${location.longitude});
+              nwr["brand"~"mercado|supermercado|mercearia|minimercado|atacado|sacolao|sacolão|hortifruti|hortifrúti|conveniencia|conveniência|emporio|empório|armazem|armazém",i](around:$radiusMeters,${location.latitude},${location.longitude});
             );
             out center tags;
         """.trimIndent()
@@ -296,11 +333,33 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
                 lat = lat,
                 lon = lon,
                 distanceMeters = distance[0].toDouble(),
-                address = buildAddress(tags)
+                address = buildAddress(tags),
+                kind = parseKind(tags, name)
             )
         }
         return markets.distinctBy { it.key }.sortedBy { it.distanceMeters }.take(MAX_RESULTS)
     }
+
+    private fun parseKind(tags: JSONObject, fallbackName: String): String {
+        val shop = tags.optString("shop")
+        val amenity = tags.optString("amenity")
+        val text = (fallbackName + " " + tags.optString("brand")).lowercase(Locale("pt", "BR"))
+        return when {
+            amenity == "marketplace" -> "Feira / mercado"
+            shop == "supermarket" -> "Supermercado"
+            shop == "convenience" -> "Conveniência"
+            shop == "grocery" -> "Mercearia"
+            shop == "greengrocer" -> "Hortifruti"
+            shop == "wholesale" -> "Atacado"
+            shop == "department_store" -> "Loja de departamentos"
+            text.contains("hort") -> "Hortifruti"
+            text.contains("atacad") -> "Atacado"
+            text.contains("conven") -> "Conveniência"
+            text.contains("merc") || text.contains("mercer") || text.contains("armaz") -> "Mercado"
+            else -> "Mercado"
+        }
+    }
+
     private fun renderMarkets(markets: List<NearbyMarket>) {
         val favorites = marketPreferences.favoriteKeys()
         val associatedLists = shoppingRepository.loadLists()
@@ -313,6 +372,9 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
             )
         }.sortedWith(compareByDescending<NearbyMarket> { it.favorite }.thenBy { it.distanceMeters })
         adapter.submitList(displayedMarkets)
+        resultsTitle.text = if (displayedMarkets.isEmpty()) "Resultados" else "Resultados (${displayedMarkets.size})"
+        favoriteHint.visibility = if (displayedMarkets.isEmpty()) View.GONE else View.VISIBLE
+        emptyText.visibility = if (displayedMarkets.isEmpty()) View.VISIBLE else View.GONE
         renderMap(displayedMarkets)
     }
 
@@ -327,6 +389,7 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
                     put("lon", market.lon)
                     put("distanceMeters", market.distanceMeters)
                     put("address", market.address)
+                    put("kind", market.kind)
                     put("source", market.source)
                     put("fromCache", market.fromCache)
                     put("favorite", market.favorite)
@@ -336,6 +399,7 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         }
         val quoted = JSONObject.quote(payload.toString())
         webView.evaluateJavascript("renderMarkets(JSON.parse($quoted))", null)
+        refreshMapSoon()
     }
 
     private fun toggleFavorite(market: NearbyMarket) {
@@ -383,6 +447,21 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
         startActivity(Intent(this, ListDetailActivity::class.java).putExtra(ListDetailActivity.EXTRA_LIST_ID, listId))
     }
 
+    private fun refreshMapSoon() {
+        if (!mapReady) return
+        webView.postDelayed({
+            webView.evaluateJavascript("refreshMapLayout()", null)
+        }, 180L)
+    }
+
+    private fun setMapState(message: String, loading: Boolean) {
+        if (!mapReady) return
+        val text = JSONObject.quote(message)
+        webView.post {
+            webView.evaluateJavascript("setMapState($text, ${if (loading) "true" else "false"})", null)
+        }
+    }
+
     private fun executeOverpass(query: String): String {
         var lastError: Throwable? = null
         for (endpoint in OVERPASS_URLS) {
@@ -413,7 +492,7 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
     private fun buildAddress(tags: JSONObject): String {
         val street = tags.optString("addr:street")
         val number = tags.optString("addr:housenumber")
-        val neighborhood = tags.optString("addr:suburb")
+        val neighborhood = tags.optString("addr:suburb").ifBlank { tags.optString("addr:neighbourhood") }
         val city = tags.optString("addr:city")
         return listOf(
             listOf(street, number).filter { it.isNotBlank() }.joinToString(", "),
@@ -436,6 +515,7 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
             else {
                 progress.visibility = View.GONE
                 status.text = "Permissão de localização necessária para encontrar mercados próximos."
+                setMapState("Permissão de localização necessária.", false)
             }
         }
     }
@@ -487,7 +567,7 @@ class NearbyMarketsActivity : AppCompatActivity(), LocationListener {
     companion object {
         private const val REQUEST_LOCATION = 7001
         private const val MIN_RESULTS_BEFORE_STOP = 5
-        private const val MAX_RESULTS = 100
+        private const val MAX_RESULTS = 120
         private val RADIUS_STEPS_METERS = listOf(5_000, 10_000, 20_000, 30_000, 50_000)
         private val OVERPASS_URLS = listOf(
             "https://overpass-api.de/api/interpreter",

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.40+44 (listas mais elegantes e mercados aprimorados)
+
+- Cartões das listas da home redesenhados com emoji contextual, chips de estado e mercado vinculado, total mais legível e dica de progresso/orçamento.
+- Formulário de lista ajustado: sugestões rápidas trocadas de `ChipGroup` irregular para uma grade de botões consistente, com melhor alinhamento e área de toque.
+- Consulta de mercados ampliada no Overpass: além de `shop=supermarket` e `convenience`, agora considera `grocery`, `greengrocer`, `wholesale`, `department_store`, `amenity=marketplace` e nomes/marcas típicos de mercado/mercearia.
+- Mapa Leaflet/OpenStreetMap atualizado para usar `circleMarker`, overlay de estado, `invalidateSize()` após o layout e mensagens mais claras de carregamento/indisponibilidade.
+- Lista de resultados de mercados ganhou contador, vazio contextual e exibição do tipo do estabelecimento.
+- Cache recente, favoritos e vínculo entre mercados e listas foram mantidos, incluindo a criação de lista a partir do mercado.
+- Validações estáticas `validate_ui_restyle.py`, `validate_purchase_catalog.py`, `validate_branding.py` e `validate_final.py` aprovadas; build Gradle/Android ainda pendente neste ambiente.
+
 ## 1.0.39+43 (ajustes do editor e novos ícones)
 
 - Tela de inclusão/edição de produtos reconstruída com cabeçalho e ação Salvar fixos, contornos discretos e opções secundárias recolhíveis.

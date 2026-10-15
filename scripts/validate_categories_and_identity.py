@@ -17,7 +17,7 @@ for file in list((main/'java').rglob('*.kt')) + list((root/'app/src/test').rglob
 identity = json.loads((root/'app_identity.json').read_text())
 assert identity['applicationId'] == 'com.listadecompras.app'
 assert identity['technicalName'] == 'listadecompras'
-assert identity['versionName'] == '1.0.39' and identity['versionCode'] == 43
+assert identity['versionName'] == '1.0.40' and identity['versionCode'] == 44
 
 res = main/'res'
 android = '{http://schemas.android.com/apk/res/android}'
@@ -27,7 +27,7 @@ def ids(filename):
 assert {'spinnerCategory','buttonNewCategory','textSelectedCategoryIcon'} <= ids('dialog_item.xml')
 assert {'layoutNewCategoryName','inputNewCategoryName','buttonChooseCategoryIcon'} <= ids('dialog_category.xml')
 assert {'cardNewEmptyList','cardNewFromTemplate','closeNewListChoice'} <= ids('dialog_new_list_choice.xml')
-assert {'chipListWeek','chipListFair','chipListPharmacy','chipListTrip'} <= ids('dialog_list.xml')
+assert {'buttonSuggestionWeek','buttonSuggestionFair','buttonSuggestionPharmacy','buttonSuggestionTrip'} <= ids('dialog_list.xml')
 
 repository = (code/'data/CategoryRepository.kt').read_text()
 assert 'SQLiteOpenHelper' in repository and 'CREATE TABLE categories' in repository

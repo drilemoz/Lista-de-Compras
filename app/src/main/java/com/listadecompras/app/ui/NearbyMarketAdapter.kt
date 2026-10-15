@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.listadecompras.app.R
 import com.listadecompras.app.model.NearbyMarket
 import java.util.Locale
@@ -26,25 +27,27 @@ class NearbyMarketAdapter(
     inner class Holder(view: View) : RecyclerView.ViewHolder(view) {
         private val name: TextView = view.findViewById(R.id.textMarketName)
         private val distance: TextView = view.findViewById(R.id.textMarketDistance)
+        private val kind: Chip = view.findViewById(R.id.chipMarketKind)
         private val address: TextView = view.findViewById(R.id.textMarketAddress)
         private val source: TextView = view.findViewById(R.id.textMarketSource)
         private val favorite: MaterialButton = view.findViewById(R.id.buttonFavoriteMarket)
         private val listAction: MaterialButton = view.findViewById(R.id.buttonMarketList)
 
         fun bind(market: NearbyMarket) {
-            name.text = if (market.favorite) "★ ${market.name}" else market.name
+            name.text = market.name
             distance.text = formatDistance(market.distanceMeters)
+            kind.text = market.kind.ifBlank { "Mercado" }
             address.text = market.address
             address.visibility = if (market.address.isBlank()) View.GONE else View.VISIBLE
             source.text = if (market.fromCache) {
                 "Origem: ${market.source} • cache recente"
             } else {
-                "Origem: ${market.source} • Overpass"
+                "Origem: ${market.source} • consulta online"
             }
             favorite.text = if (market.favorite) "★" else "☆"
             favorite.contentDescription = if (market.favorite) "Remover ${market.name} dos favoritos" else "Favoritar ${market.name}"
             favorite.setOnClickListener { onFavorite(market) }
-            listAction.text = if (market.listId != null) "Abrir lista deste mercado" else "Criar lista"
+            listAction.text = if (market.listId != null) "Abrir lista deste mercado" else "Criar lista para este mercado"
             listAction.setOnClickListener { onListAction(market) }
             itemView.setOnClickListener { onListAction(market) }
         }

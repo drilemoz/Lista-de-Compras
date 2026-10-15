@@ -2,15 +2,14 @@ package com.listadecompras.app.ui
 
 import android.view.LayoutInflater
 import android.widget.ImageButton
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.listadecompras.app.R
 import com.listadecompras.app.util.InsetsHelper
-import androidx.appcompat.app.AppCompatActivity
 
 object ListDialog {
     fun show(
@@ -43,12 +42,12 @@ object ListDialog {
             if (creating) android.view.View.VISIBLE else android.view.View.GONE
         buttonSave.text = actionLabel ?: if (creating) "Criar lista" else "Salvar alterações"
         listOf(
-            R.id.chipListWeek to "Compras da semana",
-            R.id.chipListFair to "Feira",
-            R.id.chipListPharmacy to "Farmácia",
-            R.id.chipListTrip to "Viagem"
+            R.id.buttonSuggestionWeek to "Compras da semana",
+            R.id.buttonSuggestionFair to "Feira",
+            R.id.buttonSuggestionPharmacy to "Farmácia",
+            R.id.buttonSuggestionTrip to "Viagem"
         ).forEach { (id, label) ->
-            view.findViewById<Chip>(id).setOnClickListener {
+            view.findViewById<MaterialButton>(id).setOnClickListener {
                 name.setText(label)
                 name.setSelection(label.length)
             }

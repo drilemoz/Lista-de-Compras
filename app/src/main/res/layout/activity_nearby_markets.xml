@@ -129,14 +129,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="16dp"
-            android:text="Se houver poucas opções, a busca amplia o raio automaticamente."
+            android:text="Busca supermercados, mercearias, conveniências, atacados e hortifrutis. Se houver poucas opções, o raio aumenta automaticamente."
             android:textAppearance="@style/TextAppearance.Material3.BodySmall"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
         <com.google.android.material.card.MaterialCardView
-    style="@style/Widget.ListaCompras.Card"
+            style="@style/Widget.ListaCompras.Card"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="244dp"
             android:layout_marginStart="14dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="14dp"
@@ -156,8 +156,8 @@
 
                 <com.google.android.material.progressindicator.CircularProgressIndicator
                     android:id="@+id/progressMarkets"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
                     android:layout_gravity="center" />
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -188,6 +188,19 @@
                 android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
                 android:textColor="?attr/colorPrimary" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/textEmptyMarkets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Nenhum mercado encontrado no raio atual. Tente ampliar o alcance ou atualizar sua localização."
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerMarkets"

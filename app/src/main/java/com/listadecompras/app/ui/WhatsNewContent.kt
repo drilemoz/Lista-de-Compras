@@ -1,17 +1,17 @@
 package com.listadecompras.app.ui
 
 object WhatsNewContent {
-    const val CONTENT_VERSION_CODE = 43
+    const val CONTENT_VERSION_CODE = 44
     const val TITLE = "O que mudou nesta atualização"
-    const val SUBTITLE = "Cadastro de produtos renovado, ofertas mais claras e categorias personalizadas."
+    const val SUBTITLE = "Listas mais elegantes e mercados próximos com busca e mapa melhores."
 
     val changes = listOf(
-        Change("Editor renovado", "Campos compactos, cabeçalho e botão Salvar fixos, e opções extras recolhíveis."),
-        Change("Divisão de preço", "Informe o valor do combo e quantas unidades ele contém. O preço unitário é calculado sem alterar o total original."),
-        Change("Campo de nome ajustado", "O campo Nome do produto ganhou mais espaçamento interno para separar melhor o rótulo e o texto digitado."),
-        Change("Mais ícones", "A biblioteca foi ampliada com opções para tecnologia, carros, bicicleta, ferramentas, roupas, games e outros temas."),
-        Change("Seletor rolável", "A grade de ícones continua em blocos, mas agora pode rolar para acomodar as novas opções com conforto."),
-        Change("Backup atualizado", "Ofertas com valor original e quantidade são preservadas no backup JSON schema 7 e nos modelos.")
+        Change("Listas mais modernas", "Os cartões da tela inicial ficaram mais informativos, com estado da compra, mercado vinculado e visual mais atraente."),
+        Change("Sugestões alinhadas", "A criação de listas ganhou sugestões rápidas em grade, corrigindo o desalinhamento e melhorando a área de toque."),
+        Change("Busca ampliada", "Mercados próximos agora pesquisa supermercados, mercearias, hortifrutis, conveniências, atacados e feiras/marketplaces."),
+        Change("Mapa corrigido", "O mapa OpenStreetMap/Leaflet recebeu ajustes de carregamento, redimensionamento e marcadores mais confiáveis."),
+        Change("Resultados mais claros", "A tela mostra contagem de mercados, tipo do estabelecimento, estado vazio contextual e ações mais objetivas."),
+        Change("Dados preservados", "Favoritos, cache recente e listas associadas aos mercados continuam compatíveis com a base atual.")
     )
 
     data class Change(val title: String, val description: String)

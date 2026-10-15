@@ -69,6 +69,7 @@ class MarketPreferencesRepository(context: Context) {
                         put("lon", market.lon)
                         put("distanceMeters", market.distanceMeters)
                         put("address", market.address)
+                        put("kind", market.kind)
                         put("source", market.source)
                     })
                 }
@@ -107,6 +108,7 @@ class MarketPreferencesRepository(context: Context) {
                     lon = lon,
                     distanceMeters = currentDistance[0].toDouble(),
                     address = item.optString("address", ""),
+                    kind = item.optString("kind", "Mercado").ifBlank { "Mercado" },
                     source = item.optString("source", "OpenStreetMap"),
                     fromCache = true
                 )

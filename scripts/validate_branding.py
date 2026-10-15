@@ -44,4 +44,4 @@ assert 'cardNewFromTemplate' in main
 workflow = (root/'.github/workflows/android-release.yml').read_text()
 assert 'LISTA_COMPRAS_KEYSTORE_PATH' in (root/'scripts/resolve_signing.sh').read_text() and 'LISTA_MERCADO_KEYSTORE_BASE64' in workflow
 assert 'Lista-de-Compras-v${VERSION_NAME}.apk' in workflow
-print('Identidade 1.0.39, SQLite categorias, editor ajustado e backups antigo/novo: OK')
+print('Identidade 1.0.40, SQLite categorias, listas aprimoradas e backups antigo/novo: OK')

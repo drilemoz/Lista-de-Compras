@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.39+43`
+`1.0.40+44`
 
 ## Identidade técnica
 
@@ -17,6 +17,16 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.40+44 (listas mais elegantes e mercados aprimorados)
+
+- Cartões das listas redesenhados com visual mais rico: ícone contextual por lista, estado de compra destacado, mercado vinculado e mensagem de progresso/orçamento mais clara.
+- Diálogo **Nova lista** ajustado com sugestões rápidas em grade 2x2, alinhadas visualmente e mais fáceis de tocar.
+- Tela **Mercados próximos** agora busca também mercearias, hortifrutis, atacados, conveniências e marketplaces/feiras, reduzindo os casos em que quase nada aparecia.
+- Mapa Leaflet/OpenStreetMap melhorado com marcadores em `circleMarker`, ajuste automático de layout (`invalidateSize`) e estados de carregamento/empty state mais claros.
+- Lista de resultados de mercados ganhou contagem visível, vazio contextual, tipo do estabelecimento e CTA de lista mais descritivo.
+- Persistência de favoritos, vínculo com listas e cache recente foram preservados.
+- Validações estáticas foram reexecutadas; compilação Gradle/Android e teste físico continuam pendentes neste ambiente.
 
 ## Atualização 1.0.39+43 (ajustes do editor e novos ícones)
 
