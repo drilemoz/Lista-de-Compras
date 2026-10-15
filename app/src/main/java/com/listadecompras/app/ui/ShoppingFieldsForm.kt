@@ -140,7 +140,7 @@ internal class ShoppingFieldsForm(
             summary.text = "Informe links HTTP ou HTTPS válidos, sem credenciais."
             return false
         }
-        if (store.text.orEmpty().length > 120 || variant.text.orEmpty().length > 120 || altStore.text.orEmpty().length > 120) {
+        if (listOf(store, variant, altStore).any { it.text?.toString().orEmpty().length > 120 }) {
             summary.text = "Loja e variante devem ter até 120 caracteres."
             return false
         }

@@ -1,7 +1,8 @@
-# Validação 1.0.42+46
+# Validação 1.0.43+47
 
-Verificar localmente: 16 validadores Python, teste de assinatura, sintaxe Kotlin/XML, teste JVM da calculadora e ZIP íntegro.
-
-Verificar no GitHub Actions: `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug`, assinatura de Release com os mesmos Secrets.
-
-Testar em aparelho: criar Supermercado/Shopping; cadastrar produtos com preço à vista/parcelas; editar/restaurar; link HTTP(S); comparar lojas com frete; conferir aviso acima de 50%; vencimento/parcelas pagas; converter lista com peso; exportar/importar backups schema 7 e 8; CSV; listas e modelos existentes; totais do supermercado.
+- Origem: logs Build 8, etapa `:app:compileDebugKotlin`: três `Unresolved reference 'orEmpty'` em `ShoppingFieldsForm.kt:143`.
+- Corrigida a leitura de `Editable` dos campos de loja/variante antes da chamada de `orEmpty()`.
+- Novo guard de regressão no `scripts/validate_shopping_mode.py`, além dos demais validadores existentes.
+- Testar no CI: `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug` e eventual Release assinada.
+- Teste manual: campo Loja/Variante/Outra loja até 120 caracteres, link, parcelamento, comparação e restauração de backup.
+- Compilação Android completa não realizada localmente se faltarem Gradle/Android SDK; não considerar APK validado sem execução no CI.

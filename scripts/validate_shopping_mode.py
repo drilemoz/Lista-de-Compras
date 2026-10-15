@@ -28,6 +28,10 @@ assert {'sectionShopping','checkShopInstallments', 'sectionShopInstallments', 'i
 
 form = (code/'ui/ShoppingFieldsForm.kt').read_text()
 assert 'Acréscimo total acima de 50%' in form
+# Build 8 regression: TextInputEditText.text is Editable, not String. Never call
+# String?.orEmpty() directly on Editable; convert to String before checking length.
+assert '.text.orEmpty()' not in form, 'Build 8: Editable.orEmpty() fails compileDebugKotlin'
+assert 'listOf(store, variant, altStore).any { it.text?.toString().orEmpty().length > 120 }' in form
 for key in ('InstallmentCalculator.calculate(', 'validDueDate(', 'nextDueDate(', 'validUrl(', 'fun restore(', 'fun validate(', 'fun applyTo('):
     assert key in form, key
 ui = (code/'ui/ItemDialog.kt').read_text()

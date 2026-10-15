@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.42+46`
+`1.0.43+47`
 
 ## Identidade técnica
 
@@ -17,6 +17,13 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.43+47 (correção do Build 8)
+
+- Corrigido erro de compilação Kotlin em `ShoppingFieldsForm.kt` (linha 143 do Build 8): os campos EditText de loja, variante e loja alternativa agora convertem `Editable` para `String` antes de aplicar `orEmpty()` e verificar o limite de 120 caracteres.
+- Incluído teste estático de regressão em `scripts/validate_shopping_mode.py` para bloquear esse padrão incompatível na próxima alteração.
+- Mantidos os dois modos de lista, cálculos de parcelamento, links, categorias, exportações, dados locais, assinatura e backup schema 8, sem migração de dados.
+- O Build 8 falhou em `:app:compileDebugKotlin`; a compilação completa, Lint e APK ainda precisam ser confirmados pelo GitHub Actions.
 
 ## Atualização 1.0.42+46 (duas modalidades)
 

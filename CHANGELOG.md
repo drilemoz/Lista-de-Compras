@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.43+47 (correção do Build 8: Kotlin ShoppingFieldsForm)
+
+- Corrigidas três referências `orEmpty()` inválidas em `ShoppingFieldsForm.kt:143` que impediam `:app:compileDebugKotlin` no Build 8.
+- O limite de 120 caracteres para loja, variante e loja alternativa continua sendo validado, agora sobre a representação `String` dos campos `Editable`.
+- Adicionado guard de regressão no validador do modo Shopping para impedir o retorno da expressão inválida.
+- Sincronizados `versionCode=47`, `versionName=1.0.43`, metadados, README, notas da versão e a tela Novidades.
+- Preservados `applicationId`, assinatura e Secrets, schema 8, dados, telas e fórmulas de parcelamento. Sem evidência de APK compilado nesta entrega.
+
 ## 1.0.42+46 (Supermercado + Shopping com parcelamento)
 
 - Fluxo de criação com dois tipos de lista: Supermercado (existente) e Shopping/online, com sugestões de nomes específicas; modelos continuam disponíveis.

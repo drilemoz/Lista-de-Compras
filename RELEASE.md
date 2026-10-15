@@ -1,10 +1,8 @@
-# Lista de Compras 1.0.42+46
+# Lista de Compras 1.0.43+47
 
-- Nova lista: Supermercado ou Shopping/online, com atalhos de nome adaptados.
-- No Shopping: loja, link clicável, variante, preço à vista, parcelas, entrada, frete, taxas, quantidade paga e data do primeiro vencimento.
-- Comparação de preços entre duas lojas/ofertas, incluindo custos adicionais.
-- Resumos do custo à vista, parcelado e compromisso mensal, aviso de acréscimo total acima de 50%.
-- Conversão manual de listas antigas; suporte a modelos Shopping e backup schema 8 com compatibilidade antiga.
-- Sem alterações do package ID, Secrets ou keystore; dados de supermercado preservados.
+- Corrigido Build 8: compilação Kotlin falhou com três `Unresolved reference 'orEmpty'` em `ShoppingFieldsForm.kt:143` ao validar loja, variante e loja alternativa.
+- A leitura agora converte o texto editável (`Editable`) em `String` antes de verificar o tamanho máximo de 120 caracteres.
+- Validador de regressão do modo Shopping atualizado para identificar o padrão inválido.
+- Mantidos Supermercado e Shopping, parcelamento, comparações, backup schema 8, identificador Android e assinatura existentes.
 
-**Importante:** acréscimo total não é taxa mensal/CET. A compilação Gradle, o Android Lint e o teste físico ainda precisam ser executados no CI/aparelho.
+**Pendente:** executar novamente o workflow GitHub Actions para confirmar `:app:compileDebugKotlin`, testes, Lint, APK Debug e Release assinada.
