@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.41+45 (correção do Build 6: validador Overpass)
+
+- Os logs mostraram falha na etapa `Validate source and version`: o teste procurava literalmente `shop="supermarket"`, removido na migração para `shop~"^(supermarket|...)$"` na v1.0.40.
+- Extraída a consulta Overpass para `MarketOverpassClient.kt`, reduzindo `NearbyMarketsActivity.kt` para menos de 500 linhas sem alterar a resposta da busca.
+- Substituída a checagem obsoleta por verificação da consulta Overpass expandida: tipos de comércio, `amenity=marketplace`, busca por `name`/`brand`, raio e retorno de centros/tags.
+- Ajustado o teste legado de tint do Build 25 para o card redesenhado na versão 1.0.40, mantendo a proibição de `android:tint` em layouts AppCompat.
+- Mantidos mapa, editor, categorias, listas, dados, backup schema 7, identificador Android e assinatura.
+- Compilação e Android Lint da v1.0.40 não chegaram a executar; novo build no CI permanece necessário.
+- Aprovados os 15 validadores Python, 2 conjuntos de testes Kotlin/JVM, análise PSI de 60 arquivos Kotlin, 58 XMLs, 2 JSONs e sintaxe JavaScript do mapa.
+
 ## 1.0.40+44 (listas mais elegantes e mercados aprimorados)
 
 - Cartões das listas da home redesenhados com emoji contextual, chips de estado e mercado vinculado, total mais legível e dica de progresso/orçamento.

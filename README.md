@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.40+44`
+`1.0.41+45`
 
 ## Identidade técnica
 
@@ -17,6 +17,14 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.41+45 (correção do Build 6)
+
+- Corrigida a validação de código-fonte do GitHub Actions que ainda exigia a consulta antiga `shop="supermarket"` após a ampliação da busca no Overpass.
+- A consulta foi isolada em `MarketOverpassClient.kt` para respeitar o limite de tamanho dos arquivos Kotlin. O novo contrato verifica os tipos suportados, a inclusão de feiras e os filtros por nome/marca.
+- O guard de tint do Build 25 foi ajustado para refletir o card com emoji da home, sem desativar as regras do Android Lint.
+- Sem mudanças de `applicationId`, keystore/Secrets, banco SQLite, dados salvos ou formato do backup.
+- É necessário repetir o workflow para verificar o build Gradle/Android e os testes no runner.
 
 ## Atualização 1.0.40+44 (listas mais elegantes e mercados aprimorados)
 

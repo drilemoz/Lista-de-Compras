@@ -1,7 +1,8 @@
-# Validação 1.0.40+44
+# Validação 1.0.41+45
 
-- Executados localmente com sucesso: `scripts/validate_ui_restyle.py`, `scripts/validate_purchase_catalog.py`, `scripts/validate_branding.py` e `scripts/validate_final.py`.
-- Conferir no GitHub Actions: `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug` e assinatura Release, como nas versões anteriores.
-- UI manual recomendada: cartões da home, criação/renomeação de listas com sugestões 2x2, busca de mercados por 5/10/20/30/50 km, favoritos, criação de lista a partir do mercado, cache offline e reabertura da tela.
-- Validar em aparelho o mapa Leaflet/OpenStreetMap, especialmente o recálculo de layout após abrir a tela e após mudar o raio.
-- Sem build Gradle Android completo local por ausência de wrapper/SDK neste ambiente; CI precisa confirmar.
+- Build 6 (logs): falha na validação de fonte antes de Gradle por expectativa obsoleta de `shop="supermarket"`.
+- Corrigido `scripts/validate_source.py` para reconhecer `MarketOverpassClient.kt` e conferir tipos de estabelecimentos, feira, nome/marca, raio e tags.
+- Refatorado `NearbyMarketsActivity.kt` de 577 para 469 linhas; o módulo `MarketOverpassClient.kt` tem 120 linhas.
+- Corrigido guard `scripts/validate_lint_build25.py`: o novo card tem emoji `TextView` e um `ImageButton`, sem `android:tint`.
+- Aprovados localmente: 15 validadores Python incluindo assinatura (casos com/sem Secrets); 2 testes Kotlin/JVM independentes (12 testes de entrada e 13 verificações finais); parser Kotlin PSI (60 arquivos); 58 XML; 2 JSON; sintaxe JavaScript embutida no mapa.
+- `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug`, assinatura Release e execução no Android real não rodaram neste ambiente sem Android SDK/Gradle; requer CI.

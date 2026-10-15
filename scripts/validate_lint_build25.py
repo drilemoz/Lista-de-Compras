@@ -30,7 +30,12 @@ for xml in layout_dir.glob('*.xml'):
             assert android + 'tint' not in element.attrib, f'{xml}: duplicate tint'
     if xml.name in previous_errors:
         count = contents.count('app:tint=')
-        assert count >= previous_errors[xml.name], (xml.name, count)
+        # v1.0.40 replaced the colored store ImageView with an emoji TextView.
+        # The remaining action icon must still use the AppCompat tint namespace.
+        expected = 1 if xml.name == 'item_list.xml' else previous_errors[xml.name]
+        if xml.name == 'item_list.xml':
+            assert '@+id/textListEmoji' in contents and '@+id/buttonListMore' in contents
+        assert count >= expected, (xml.name, count)
 
 scanner = (root / 'app/src/main/java/com/listadecompras/app/ui/BarcodeScannerActivity.kt').read_text()
 assert 'import androidx.camera.core.ExperimentalGetImage' in scanner

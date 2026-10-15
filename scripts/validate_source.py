@@ -114,12 +114,37 @@ if "android.permission.VIBRATE" not in manifest:
     raise SystemExit("Missing VIBRATE permission for safe barcode-scan feedback")
 
 map_source = (root / "app/src/main/java/com/listadecompras/app/ui/NearbyMarketsActivity.kt").read_text(encoding="utf-8")
+market_search_source = (root / "app/src/main/java/com/listadecompras/app/ui/MarketOverpassClient.kt").read_text(encoding="utf-8")
+if "MarketOverpassClient.queryMarkets(location, radius)" not in map_source:
+    raise SystemExit("NearbyMarketsActivity does not call the extracted Overpass search")
 market_repo_source = (root / "app/src/main/java/com/listadecompras/app/data/MarketPreferencesRepository.kt").read_text(encoding="utf-8")
 market_layout = (root / "app/src/main/res/layout/activity_nearby_markets.xml").read_text(encoding="utf-8")
 market_item_layout = (root / "app/src/main/res/layout/item_nearby_market.xml").read_text(encoding="utf-8")
 map_html = (root / "app/src/main/assets/nearby_markets_map.html").read_text(encoding="utf-8")
-if "overpass-api.de" not in map_source or 'shop"="supermarket' not in map_source:
-    raise SystemExit("Nearby supermarket map/Overpass query is missing or incomplete")
+# The original query used one shop=supermarket clause. Since 1.0.40, the
+# expanded Overpass QL uses shop regex plus amenity/name/brand clauses.
+# Validate the query semantics instead of a now-obsolete source substring.
+query_block = re.search(r'val\s+query\s*=\s*"""(.*?)"""\.trimIndent\(\)', market_search_source, re.S)
+if query_block is None or "overpass-api.de" not in market_search_source or "executeOverpass(query)" not in market_search_source:
+    raise SystemExit("Missing Overpass endpoint, query or execution in NearbyMarketsActivity")
+query = query_block.group(1)
+shop_filters = re.findall(r'nwr\["shop"([=~])"([^"]+)"\]', query)
+covered_shop_types = set()
+for operator, value in shop_filters:
+    if operator == "=":
+        covered_shop_types.add(value)
+    elif operator == "~":
+        covered_shop_types.update(re.findall(r'[a-z_]+', value))
+expected_types = {"supermarket", "convenience", "grocery", "greengrocer", "wholesale"}
+if not expected_types <= covered_shop_types:
+    missing = sorted(expected_types - covered_shop_types)
+    raise SystemExit(f"Overpass market search missing shop types: {missing}")
+if not re.search(r'nwr\["amenity"="marketplace"\]', query):
+    raise SystemExit("Overpass market search lost the marketplace/feira filter")
+if not all(f'nwr["{tag}"~' in query for tag in ("name", "brand")):
+    raise SystemExit("Overpass market search lost name/brand fallback filters")
+if 'out center tags;' not in query or '(around:$radiusMeters,' not in query:
+    raise SystemExit("Overpass query must return positions/tags and honor search radius")
 for radius in ("5_000", "10_000", "20_000", "30_000", "50_000"):
     if radius not in map_source:
         raise SystemExit(f"Manual/adaptive market radius missing: {radius}")
