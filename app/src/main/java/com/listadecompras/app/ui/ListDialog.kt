@@ -9,6 +9,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.listadecompras.app.R
+import com.listadecompras.app.model.ListType
 import com.listadecompras.app.util.InsetsHelper
 
 object ListDialog {
@@ -18,6 +19,7 @@ object ListDialog {
         titleOverride: String? = null,
         subtitleOverride: String? = null,
         actionLabel: String? = null,
+        listType: ListType = ListType.SUPERMARKET,
         onSave: (String) -> Unit
     ) {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_list, null)
@@ -30,9 +32,13 @@ object ListDialog {
         val buttonCancel = view.findViewById<MaterialButton>(R.id.buttonCancelList)
         val buttonClose = view.findViewById<ImageButton>(R.id.buttonCloseListSheet)
 
-        title.text = titleOverride ?: if (initialName.isBlank()) "Nova lista" else "Renomear lista"
+        title.text = titleOverride ?: when {
+            initialName.isNotBlank() -> "Renomear lista"
+            listType == ListType.SHOPPING -> "Nova lista de Shopping"
+            else -> "Nova lista"
+        }
         subtitle.text = subtitleOverride ?: if (initialName.isBlank()) {
-            "Crie uma lista para cada mercado, data de compra ou ocasião."
+            if (listType == ListType.SHOPPING) "Organize lojas, links, preços à vista e parcelas." else "Crie uma lista para cada mercado, data de compra ou ocasião."
         } else {
             "Dê um nome mais claro para identificar seu mercado ou compra."
         }
@@ -41,15 +47,24 @@ object ListDialog {
         view.findViewById<android.view.View>(R.id.layoutListSuggestions).visibility =
             if (creating) android.view.View.VISIBLE else android.view.View.GONE
         buttonSave.text = actionLabel ?: if (creating) "Criar lista" else "Salvar alterações"
-        listOf(
-            R.id.buttonSuggestionWeek to "Compras da semana",
-            R.id.buttonSuggestionFair to "Feira",
-            R.id.buttonSuggestionPharmacy to "Farmácia",
-            R.id.buttonSuggestionTrip to "Viagem"
-        ).forEach { (id, label) ->
-            view.findViewById<MaterialButton>(id).setOnClickListener {
+        val choices = if (listType == ListType.SHOPPING) listOf(
+            Triple(R.id.buttonSuggestionWeek, "📱 Tecnologia", "Tecnologia"),
+            Triple(R.id.buttonSuggestionFair, "👕 Roupas", "Roupas e calçados"),
+            Triple(R.id.buttonSuggestionPharmacy, "🚲 Bicicleta", "Acessórios para bicicleta"),
+            Triple(R.id.buttonSuggestionTrip, "🏠 Casa", "Itens para casa")
+        ) else listOf(
+            Triple(R.id.buttonSuggestionWeek, "🛒 Semana", "Compras da semana"),
+            Triple(R.id.buttonSuggestionFair, "🥕 Feira", "Feira"),
+            Triple(R.id.buttonSuggestionPharmacy, "💊 Farmácia", "Farmácia"),
+            Triple(R.id.buttonSuggestionTrip, "🚲 Viagem", "Viagem")
+        )
+        choices.forEach { (id, caption, label) ->
+            view.findViewById<MaterialButton>(id).apply {
+                text = caption
+                setOnClickListener {
                 name.setText(label)
                 name.setSelection(label.length)
+                }
             }
         }
         name.setText(initialName)

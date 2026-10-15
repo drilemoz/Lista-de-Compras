@@ -4,6 +4,7 @@ import com.listadecompras.app.model.CatalogProduct
 import com.listadecompras.app.model.ListTemplate
 import com.listadecompras.app.model.ShoppingItem
 import com.listadecompras.app.model.ShoppingList
+import com.listadecompras.app.model.ListType
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -68,12 +69,14 @@ class BackupRepository(
         lines += listOf(
             "tipo", "lista", "produto", "quantidade_planejada", "quantidade_comprada", "unidade", "preco_unitario",
             "categoria", "comprado", "orcamento_lista", "codigo_barras", "favorito", "recorrencia",
-            "preco_alvo", "unidade_preco_alvo", "atualizado_em", "combo_total", "combo_unidades"
+            "preco_alvo", "unidade_preco_alvo", "atualizado_em", "combo_total", "combo_unidades",
+            "tipo_lista", "loja", "url_produto", "variante", "parcelas", "valor_parcela", "entrada", "frete", "taxas", "parcelas_pagas", "loja_alternativa", "url_alternativa", "avista_alternativa", "parcelas_alternativa", "valor_parcela_alternativa"
         ).joinToString(",", transform = ::csv)
         lists.forEach { list ->
             if (list.items.isEmpty()) {
                 lines += listOf(
-                    "LISTA", list.name, "", "", "", "", "", "", "", number(list.budget), "", "", "", "", "", instant(list.updatedAt), "", ""
+                    "LISTA", list.name, "", "", "", "", "", "", "", number(list.budget), "", "", "", "", "", instant(list.updatedAt), "", "",
+                    list.listType.name, "", "", "", "", "", "", "", "", "", "", "", "", "", ""
                 ).joinToString(",", transform = ::csv)
             } else {
                 list.items.forEach { item ->
@@ -94,7 +97,12 @@ class BackupRepository(
                         catalogByName[ProductCatalogRepository.normalizeName(item.name)]?.priceTarget?.let(::number).orEmpty(),
                         catalogByName[ProductCatalogRepository.normalizeName(item.name)]?.priceTargetUnit.orEmpty(),
                         instant(list.updatedAt),
-                        item.comboTotalPrice?.let(::number).orEmpty(), item.comboUnitCount?.toString().orEmpty()
+                        item.comboTotalPrice?.let(::number).orEmpty(), item.comboUnitCount?.toString().orEmpty(),
+                        list.listType.name, item.storeName, item.productUrl, item.variant,
+                        item.installmentCount.toString(), number(item.installmentAmount), number(item.downPayment),
+                        number(item.shipping), number(item.extraFees), item.paidInstallments.toString(),
+                        item.alternativeStore, item.alternativeUrl, item.alternativeCashPrice?.let(::number).orEmpty(),
+                        item.alternativeInstallments.toString(), number(item.alternativeInstallmentAmount)
                     ).joinToString(",", transform = ::csv)
                 }
             }
@@ -116,7 +124,8 @@ class BackupRepository(
                 product.recurringFrequency.orEmpty(),
                 product.priceTarget?.let(::number).orEmpty(),
                 product.priceTargetUnit.orEmpty(),
-                instant(product.updatedAt), "", ""
+                instant(product.updatedAt), "", "",
+                "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
             ).joinToString(",", transform = ::csv)
         }
         return "\uFEFF" + lines.joinToString("\r\n")
@@ -147,8 +156,7 @@ class BackupRepository(
         val products = MutableList(catalogArray.length()) { index ->
             parseProduct(catalogArray.getJSONObject(index), index)
         }
-        val templateArray = root.optJSONArray("templates") ?: JSONArray()
-        val templates = MutableList(templateArray.length()) { index ->
+        val templateArray = root.optJSONArray("templates") ?: JSONArray(); val templates = MutableList(templateArray.length()) { index ->
             parseTemplate(templateArray.getJSONObject(index), index)
         }
         val marketPrefs = root.optJSONObject("marketPreferences")
@@ -230,7 +238,6 @@ class BackupRepository(
         }
         catalogRepository.seedFromLists(mergedLists)
     }
-
     private fun prepareImportedProducts(
         imported: MutableList<CatalogProduct>,
         schemaVersion: Int
@@ -253,7 +260,6 @@ class BackupRepository(
             }
         }.toMutableList()
     }
-
     private fun mergeLists(
         current: MutableList<ShoppingList>,
         imported: MutableList<ShoppingList>,
@@ -279,13 +285,13 @@ class BackupRepository(
                     budget = if (incomingIsNewer) incoming.budget else existing.budget,
                     marketKey = if (preserveMarketAssociation) existing.marketKey else if (incomingIsNewer) incoming.marketKey else existing.marketKey,
                     marketName = if (preserveMarketAssociation) existing.marketName else if (incomingIsNewer) incoming.marketName else existing.marketName,
+                    listType = if (incomingIsNewer) incoming.listType else existing.listType,
                     items = items.values.toMutableList()
                 )
             }
         }
         return byId.values.sortedByDescending { it.updatedAt }.toMutableList()
     }
-
     private fun parseList(json: JSONObject, index: Int): ShoppingList {
         val id = json.optLong("id", 0L)
         val name = json.optString("name", "").trim()
@@ -307,10 +313,10 @@ class BackupRepository(
             budget = json.optDouble("budget", 0.0).validMoney("Lista '$name': orçamento inválido."),
             marketKey = if (json.isNull("marketKey")) null else json.optString("marketKey").takeIf { it.isNotBlank() },
             marketName = if (json.isNull("marketName")) null else json.optString("marketName").takeIf { it.isNotBlank() },
+            listType = parseListType(json.optString("listType", "SUPERMARKET")),
             items = items
         )
     }
-
     private fun parseItem(json: JSONObject, listName: String, index: Int): ShoppingItem {
         val id = json.optLong("id", 0L)
         val name = json.optString("name", "").trim()
@@ -356,9 +362,12 @@ class BackupRepository(
             category = json.optString("category", "Outros").ifBlank { "Outros" },
             note = json.optString("note", ""),
             purchased = purchased
-        )
+        ).readShoppingFields(json, strict = true)
     }
-
+    private fun parseListType(value: String): ListType {
+        require(value in ListType.entries.map { it.name }) { "O backup contém tipo de lista desconhecido." }
+        return ListType.fromStored(value)
+    }
     private fun parseProduct(json: JSONObject, index: Int): CatalogProduct {
         val id = json.optLong("id", 0L)
         val name = json.optString("name", "").trim()
@@ -387,7 +396,6 @@ class BackupRepository(
             updatedAt = json.optLong("updatedAt", id).coerceAtLeast(1L)
         )
     }
-
     private fun ShoppingList.toBackupJson() = JSONObject().apply {
         put("id", id)
         put("name", name)
@@ -396,9 +404,9 @@ class BackupRepository(
         put("budget", budget)
         put("marketKey", marketKey ?: JSONObject.NULL)
         put("marketName", marketName ?: JSONObject.NULL)
+        put("listType", listType.name)
         put("items", JSONArray().apply { items.forEach { put(it.toBackupJson()) } })
     }
-
     private fun ShoppingItem.toBackupJson() = JSONObject().apply {
         put("id", id)
         put("name", name)
@@ -411,8 +419,8 @@ class BackupRepository(
         put("category", category)
         put("note", note)
         put("purchased", purchased)
+        putShoppingFields(this@toBackupJson)
     }
-
     private fun CatalogProduct.toBackupJson() = JSONObject().apply {
         put("id", id)
         put("name", name)
@@ -429,15 +437,14 @@ class BackupRepository(
         put("lastRecurringAddedAt", lastRecurringAddedAt)
         put("updatedAt", updatedAt)
     }
-
     private fun ListTemplate.toBackupJson() = JSONObject().apply {
         put("id", id)
         put("name", name)
         put("budget", budget)
+        put("listType", listType.name)
         put("updatedAt", updatedAt)
         put("items", JSONArray().apply { items.forEach { put(it.toBackupJson()) } })
     }
-
     private fun parseTemplate(json: JSONObject, index: Int): ListTemplate {
         val id = json.optLong("id", 0L)
         val name = json.optString("name", "").trim()
@@ -456,10 +463,10 @@ class BackupRepository(
             builtIn = false,
             budget = json.optDouble("budget", 0.0).validMoney("Modelo '$name': orçamento inválido."),
             items = items,
-            updatedAt = json.optLong("updatedAt", kotlin.math.abs(id)).coerceAtLeast(1L)
+            updatedAt = json.optLong("updatedAt", kotlin.math.abs(id)).coerceAtLeast(1L),
+            listType = parseListType(json.optString("listType", "SUPERMARKET"))
         )
     }
-
     private fun buildPriceHistory(lists: List<ShoppingList>) = JSONArray().apply {
         lists.sortedBy { it.createdAt }.forEach { list ->
             list.items.filter { it.purchased && it.purchasedQuantity > 0.0 && it.unitPrice > 0.0 }.forEach { item ->
@@ -471,25 +478,22 @@ class BackupRepository(
                     put("plannedQuantity", item.quantity)
                     put("purchasedQuantity", item.purchasedQuantity)
                     put("unitPrice", item.unitPrice)
-                    put("paidTotal", item.purchasedSubtotal)
+                    put("paidTotal", if (list.listType == ListType.SHOPPING) item.shopPurchasedSubtotal else item.purchasedSubtotal)
                     put("unit", item.unit)
                     put("recordedAt", list.updatedAt)
                 })
             }
         }
     }
-
     private fun Double.validMoney(message: String): Double {
         if (!isFinite() || this < 0.0) throw IllegalArgumentException(message)
         return this
     }
-
     private fun csv(value: String): String = "\"${value.replace("\"", "\"\"")}\""
     private fun number(value: Double): String = String.format(Locale.ROOT, "%.6f", value).trimEnd('0').trimEnd('.')
     private fun instant(epochMillis: Long): String = runCatching { Instant.ofEpochMilli(epochMillis).toString() }.getOrDefault("")
-
     companion object {
-        const val SCHEMA_VERSION = 7
+        const val SCHEMA_VERSION = 8
         private const val BACKUP_FORMAT = "lista-de-compras-backup"
         private const val LEGACY_BACKUP_FORMAT = "meu-supermercado-backup"
     }

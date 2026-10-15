@@ -27,6 +27,7 @@ import com.listadecompras.app.data.SettingsRepository
 import com.listadecompras.app.data.ShoppingRepository
 import com.listadecompras.app.data.TemplateRepository
 import com.listadecompras.app.model.ShoppingList
+import com.listadecompras.app.model.ListType
 import com.listadecompras.app.util.InsetsHelper
 import com.listadecompras.app.util.ThemeController
 import java.text.NumberFormat
@@ -229,7 +230,11 @@ class MainActivity : AppCompatActivity() {
         view.findViewById<View>(R.id.closeNewListChoice).setOnClickListener { dialog.dismiss() }
         view.findViewById<View>(R.id.cardNewEmptyList).setOnClickListener {
             dialog.dismiss()
-            createEmptyList()
+            createEmptyList(ListType.SUPERMARKET)
+        }
+        view.findViewById<View>(R.id.cardNewShoppingList).setOnClickListener {
+            dialog.dismiss()
+            createEmptyList(ListType.SHOPPING)
         }
         view.findViewById<View>(R.id.cardNewFromTemplate).setOnClickListener {
             dialog.dismiss()
@@ -238,9 +243,9 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun createEmptyList() {
-        ListDialog.show(this) { name ->
-            lists.add(0, ShoppingList(name = name))
+    private fun createEmptyList(type: ListType) {
+        ListDialog.show(this, listType = type) { name ->
+            lists.add(0, ShoppingList(name = name, listType = type))
             repository.saveLists(lists)
             render()
         }
@@ -260,8 +265,26 @@ class MainActivity : AppCompatActivity() {
             onRename = { renameList(currentList) },
             onDuplicate = { duplicateList(currentList) },
             onSaveTemplate = { saveAsTemplate(currentList) },
+            onChangeType = { confirmChangeType(currentList) },
             onDelete = { confirmDelete(currentList) }
         )
+    }
+
+    private fun confirmChangeType(list: ShoppingList) {
+        val target = if (list.listType == ListType.SUPERMARKET) ListType.SHOPPING else ListType.SUPERMARKET
+        val label = if (target == ListType.SHOPPING) "Shopping" else "Supermercado"
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Converter para $label?")
+            .setMessage("Os produtos e preços existentes serão mantidos. Revise quantidades e unidades depois da conversão: " +
+                "Shopping não usa peso/volume, e as opções financeiras ficam disponíveis somente no modo Shopping.")
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Converter") { _, _ ->
+                list.listType = target
+                list.updatedAt = System.currentTimeMillis()
+                repository.saveLists(lists)
+                render()
+            }
+            .show()
     }
 
     private fun saveAsTemplate(list: ShoppingList) {
@@ -278,7 +301,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renameList(list: ShoppingList) {
-        ListDialog.show(this, list.name) { name ->
+        ListDialog.show(this, list.name, listType = list.listType) { name ->
             list.name = name
             list.updatedAt = System.currentTimeMillis()
             repository.saveLists(lists)
@@ -293,7 +316,8 @@ class MainActivity : AppCompatActivity() {
             val copiedItems = source.items.mapIndexed { index, item ->
                 item.copy(id = now + index + 1, purchased = false, purchasedQuantity = 0.0)
             }.toMutableList()
-            lists.add(0, ShoppingList(id = now, name = name, createdAt = now, updatedAt = now, budget = source.budget, items = copiedItems))
+            lists.add(0, ShoppingList(id = now, name = name, createdAt = now, updatedAt = now,
+                budget = source.budget, items = copiedItems, listType = source.listType))
             repository.saveLists(lists)
             render()
         }

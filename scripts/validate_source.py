@@ -351,7 +351,7 @@ if "item.purchasedSubtotal" not in compare_source or "comprado:" not in compare_
     raise SystemExit("Price history must show actual purchased quantity and paid total")
 
 backup_source = (root / "app/src/main/java/com/listadecompras/app/data/BackupRepository.kt").read_text(encoding="utf-8")
-if 'const val SCHEMA_VERSION = 7' not in backup_source or '"meu-supermercado-backup"' not in backup_source:
+if 'const val SCHEMA_VERSION = 8' not in backup_source or '"meu-supermercado-backup"' not in backup_source:
     raise SystemExit("Versioned JSON backup format is missing")
 if 'put("templates",' not in backup_source or 'put("favorite", favorite)' not in backup_source or 'put("recurringFrequency", recurringFrequency' not in backup_source:
     raise SystemExit("Backup must preserve templates, product favorites and recurrence")
@@ -359,7 +359,7 @@ if 'put("marketPreferences",' not in backup_source or 'put("marketKey", marketKe
     raise SystemExit("Schema 3 backup must preserve market favorites/radius and list associations")
 if 'put("priceTarget", priceTarget' not in backup_source or 'put("priceTargetUnit", priceTargetUnit' not in backup_source:
     raise SystemExit("Schema 4 backup must preserve product price targets")
-if 'put("purchasedQuantity", purchasedQuantity)' not in backup_source or 'put("paidTotal", item.purchasedSubtotal)' not in backup_source:
+if 'put("purchasedQuantity", purchasedQuantity)' not in backup_source or 'put("paidTotal", if (list.listType == ListType.SHOPPING)' not in backup_source:
     raise SystemExit("Schema 5 backup must preserve actual purchased quantity and paid total")
 if "parseAndValidate" not in backup_source or "mergeWith" not in backup_source or "replaceWith" not in backup_source:
     raise SystemExit("Backup validation/import modes are missing")

@@ -6,5 +6,6 @@ data class ListTemplate(
     val builtIn: Boolean = false,
     var budget: Double = 0.0,
     val items: MutableList<ShoppingItem> = mutableListOf(),
-    var updatedAt: Long = System.currentTimeMillis()
+    var updatedAt: Long = System.currentTimeMillis(),
+    var listType: ListType = ListType.SUPERMARKET
 )

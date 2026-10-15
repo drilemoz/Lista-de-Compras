@@ -3,6 +3,7 @@ package com.listadecompras.app.data
 import android.content.Context
 import com.listadecompras.app.model.ShoppingItem
 import com.listadecompras.app.model.ShoppingList
+import com.listadecompras.app.model.ListType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -172,6 +173,7 @@ class ShoppingRepository(context: Context) {
         put("budget", budget)
         put("marketKey", marketKey ?: JSONObject.NULL)
         put("marketName", marketName ?: JSONObject.NULL)
+        put("listType", listType.name)
         put("items", JSONArray().apply { items.forEach { put(it.toJson()) } })
     }
 
@@ -187,6 +189,7 @@ class ShoppingRepository(context: Context) {
         put("category", category)
         put("note", note)
         put("purchased", purchased)
+        putShoppingFields(this@toJson)
     }
 
     private fun JSONObject.toList(): ShoppingList {
@@ -199,7 +202,8 @@ class ShoppingRepository(context: Context) {
             budget = optDouble("budget", 0.0),
             marketKey = if (isNull("marketKey")) null else optString("marketKey").takeIf { it.isNotBlank() },
             marketName = if (isNull("marketName")) null else optString("marketName").takeIf { it.isNotBlank() },
-            items = MutableList(itemArray.length()) { index -> itemArray.getJSONObject(index).toItem() }
+            items = MutableList(itemArray.length()) { index -> itemArray.getJSONObject(index).toItem() },
+            listType = ListType.fromStored(optString("listType", "SUPERMARKET"))
         )
     }
 
@@ -226,7 +230,7 @@ class ShoppingRepository(context: Context) {
             category = optString("category", "Outros"),
             note = optString("note", ""),
             purchased = purchased
-        )
+        ).readShoppingFields(this)
     }
 
     companion object {

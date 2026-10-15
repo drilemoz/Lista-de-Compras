@@ -4,6 +4,7 @@ import android.content.Context
 import com.listadecompras.app.model.ListTemplate
 import com.listadecompras.app.model.ShoppingItem
 import com.listadecompras.app.model.ShoppingList
+import com.listadecompras.app.model.ListType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -36,11 +37,13 @@ class TemplateRepository(context: Context) {
                 builtIn = false,
                 budget = source.budget,
                 items = copiedItems,
+                listType = source.listType,
                 updatedAt = now
             )
         } else {
             existing.name = name
             existing.budget = source.budget
+            existing.listType = source.listType
             existing.items.clear()
             existing.items += copiedItems
             existing.updatedAt = now
@@ -64,7 +67,8 @@ class TemplateRepository(context: Context) {
             createdAt = now,
             updatedAt = now,
             budget = template.budget,
-            items = copiedItems
+            items = copiedItems,
+            listType = template.listType
         )
     }
 
@@ -84,6 +88,7 @@ class TemplateRepository(context: Context) {
             } else if (incoming.updatedAt >= existing.updatedAt) {
                 existing.name = incoming.name
                 existing.budget = incoming.budget
+                existing.listType = incoming.listType
                 existing.items.clear()
                 existing.items += incoming.items.map { it.copy() }
                 existing.updatedAt = incoming.updatedAt
@@ -116,6 +121,7 @@ class TemplateRepository(context: Context) {
         put("id", id)
         put("name", name)
         put("budget", budget)
+        put("listType", listType.name)
         put("updatedAt", updatedAt)
         put("items", JSONArray().apply { items.forEach { put(it.toJson()) } })
     }
@@ -132,6 +138,7 @@ class TemplateRepository(context: Context) {
         put("category", category)
         put("note", note)
         put("purchased", false)
+        putShoppingFields(this@toJson)
     }
 
     private fun JSONObject.toTemplate(): ListTemplate {
@@ -142,7 +149,8 @@ class TemplateRepository(context: Context) {
             builtIn = false,
             budget = optDouble("budget", 0.0).coerceAtLeast(0.0),
             items = MutableList(itemArray.length()) { index -> itemArray.getJSONObject(index).toItem() },
-            updatedAt = optLong("updatedAt", System.currentTimeMillis())
+            updatedAt = optLong("updatedAt", System.currentTimeMillis()),
+            listType = ListType.fromStored(optString("listType", "SUPERMARKET"))
         )
     }
 
@@ -158,7 +166,7 @@ class TemplateRepository(context: Context) {
         category = optString("category", "Outros").ifBlank { "Outros" },
         note = optString("note", ""),
         purchased = false
-    )
+    ).readShoppingFields(this)
 
     companion object {
         private const val PREFS_NAME = "lista_compras_templates"

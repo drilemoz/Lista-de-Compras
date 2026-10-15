@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ xmlns:app="http://schemas.android.com/apk/res-auto"
+ android:id="@+id/sectionShopping" android:layout_width="match_parent" android:layout_height="wrap_content"
+ android:layout_marginTop="18dp" android:orientation="vertical" android:visibility="gone">
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+   android:text="SHOPPING E ONLINE" android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+   android:textColor="?attr/colorPrimary" />
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+   android:layout_marginTop="5dp" android:text="Preços e taxas abaixo são por unidade."
+   android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Loja ou vendedor" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopStore" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="textCapWords" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Link do produto (https://...)" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopUrl" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="textUri" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Modelo, tamanho ou cor" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopVariant" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="textCapSentences" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Frete por unidade" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopShipping" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Taxas adicionais por unidade" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopFees" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.checkbox.MaterialCheckBox
+ android:id="@+id/checkShopInstallments" android:layout_width="match_parent" android:layout_height="wrap_content"
+ android:layout_marginTop="12dp" android:minHeight="48dp" android:text="Comprar parcelado" />
+<LinearLayout android:id="@+id/sectionShopInstallments" android:layout_width="match_parent"
+ android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Número de parcelas" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopCount" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Valor de cada parcela" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopInstallment" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Entrada por unidade" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopDown" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Parcelas já pagas" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputShopPaid" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Primeiro vencimento (AAAA-MM-DD)">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/inputShopDue"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="datetime" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>
+<com.google.android.material.card.MaterialCardView
+ style="@style/Widget.ListaCompras.Card.Subtle" android:layout_width="match_parent"
+ android:layout_height="wrap_content" android:layout_marginTop="12dp">
+ <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+   android:padding="14dp" android:orientation="vertical">
+   <TextView android:id="@+id/textShopSummary" android:layout_width="match_parent" android:layout_height="wrap_content"
+      android:text="Informe o preço à vista para comparar." android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+   <TextView android:id="@+id/textShopWarning" android:layout_width="match_parent" android:layout_height="wrap_content"
+      android:layout_marginTop="7dp" android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+      android:textColor="?attr/colorError" android:visibility="gone" />
+   <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+      android:layout_marginTop="7dp" android:text="Acréscimo total não é taxa de juros mensal ou CET."
+      android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+ </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+<com.google.android.material.checkbox.MaterialCheckBox
+ android:id="@+id/checkAltOffer" android:layout_width="match_parent" android:layout_height="wrap_content"
+ android:layout_marginTop="14dp" android:minHeight="48dp" android:text="Comparar com outra oferta" />
+<LinearLayout android:id="@+id/sectionAltOffer" android:layout_width="match_parent"
+ android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Loja da outra oferta" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputAltStore" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="textCapWords" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Link da outra oferta" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputAltUrl" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="textUri" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Preço à vista alternativo" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputAltCash" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Parcelas da outra oferta (opcional)" >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputAltCount" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Valor da parcela alternativa" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputAltInstallment" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Entrada da outra oferta" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/inputAltDown"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Frete da outra oferta" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/inputAltShipping"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+        style="@style/Widget.ListaCompras.Field.Outlined" android:hint="Taxas da outra oferta" app:prefixText="R$ ">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/inputAltFees"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="number" android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+<TextView android:id="@+id/textAltCompare" android:layout_width="match_parent" android:layout_height="wrap_content"
+ android:layout_marginTop="10dp" android:text="Preencha a outra oferta."
+ android:textAppearance="@style/TextAppearance.Material3.BodyMedium" android:textColor="?attr/colorPrimary" />
+</LinearLayout>
+</LinearLayout>

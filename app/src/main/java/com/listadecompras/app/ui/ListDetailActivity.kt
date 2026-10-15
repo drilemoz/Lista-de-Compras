@@ -27,6 +27,7 @@ import com.listadecompras.app.data.ProductCatalogRepository
 import com.listadecompras.app.data.ShoppingRepository
 import com.listadecompras.app.model.ShoppingItem
 import com.listadecompras.app.model.ShoppingList
+import com.listadecompras.app.model.ListType
 import com.listadecompras.app.util.InsetsHelper
 import com.listadecompras.app.util.ThemeController
 import java.text.NumberFormat
@@ -147,7 +148,7 @@ class ListDetailActivity : AppCompatActivity() {
         budgetProgress = findViewById(R.id.progressBudget)
         val recycler = findViewById<RecyclerView>(R.id.recyclerItems)
 
-        adapter = ShoppingItemAdapter(
+        adapter = ShoppingItemAdapter(isShopping = current.listType == ListType.SHOPPING,
             onChecked = { item, checked ->
                 // O DiffUtil mostra um snapshot; gravar sempre no item real da lista.
                 current.items.firstOrNull { it.id == item.id }?.let { item ->
@@ -170,8 +171,14 @@ class ListDetailActivity : AppCompatActivity() {
         findViewById<MaterialButton>(R.id.buttonAll).setOnClickListener { setFilter(Filter.ALL) }
         findViewById<MaterialButton>(R.id.buttonPending).setOnClickListener { setFilter(Filter.PENDING) }
         findViewById<MaterialButton>(R.id.buttonPurchased).setOnClickListener { setFilter(Filter.PURCHASED) }
-        findViewById<MaterialButton>(R.id.buttonPurchaseMode).setOnClickListener { openPurchaseMode() }
-        findViewById<MaterialButton>(R.id.buttonAddRecurring).setOnClickListener { openRecurringProducts() }
+        findViewById<MaterialButton>(R.id.buttonPurchaseMode).apply {
+            visibility = if (current.listType == ListType.SHOPPING) View.GONE else View.VISIBLE
+            setOnClickListener { openPurchaseMode() }
+        }
+        findViewById<MaterialButton>(R.id.buttonAddRecurring).apply {
+            visibility = if (current.listType == ListType.SHOPPING) View.GONE else View.VISIBLE
+            setOnClickListener { openRecurringProducts() }
+        }
         clearPurchased.setOnClickListener { clearPurchased() }
         budgetButton.setOnClickListener { editBudget() }
 
@@ -278,6 +285,7 @@ class ListDetailActivity : AppCompatActivity() {
     private fun addItem(initialBarcode: String? = null) = ItemDialog.show(
         context = this,
         catalogRepository = catalogRepository,
+        listType = current.listType,
         initialBarcode = initialBarcode,
         onRequestBarcode = { consumer -> requestBarcode(BARCODE_TARGET_ADD, -1L, consumer) }
     ) { newItem, barcode, priceTarget, targetUnit ->
@@ -291,6 +299,7 @@ class ListDetailActivity : AppCompatActivity() {
         context = this,
         catalogRepository = catalogRepository,
         existing = item,
+        listType = current.listType,
         initialBarcode = initialBarcode,
         onRequestBarcode = { consumer -> requestBarcode(BARCODE_TARGET_EDIT, item.id, consumer) }
     ) { edited, barcode, priceTarget, targetUnit ->
@@ -386,8 +395,10 @@ class ListDetailActivity : AppCompatActivity() {
 
     private fun render() {
         title.text = current.name
-        marketSubtitle.text = current.marketName.orEmpty()
-        marketSubtitle.visibility = if (current.marketName.isNullOrBlank()) View.GONE else View.VISIBLE
+        marketSubtitle.text = if (current.listType == ListType.SHOPPING) {
+            "🛍️ À vista ${currency.format(current.cashTotal)} • total ${currency.format(current.financedTotal)} • parcelas/mês ${currency.format(current.monthlyCommitment)}"
+        } else current.marketName.orEmpty()
+        marketSubtitle.visibility = if (marketSubtitle.text.isBlank()) View.GONE else View.VISIBLE
         val query = search.text?.toString()?.trim()?.lowercase().orEmpty()
         val visible = current.items.asSequence()
             .filter {

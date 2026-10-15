@@ -1,10 +1,10 @@
-# Lista de Compras 1.0.41+45
+# Lista de Compras 1.0.42+46
 
-- Corrigido o Build 6, interrompido pelo validador antigo da consulta Overpass antes da compilação Android.
-- Validação atualizada para reconhecer a busca ampliada de mercados e ainda detectar a remoção dos filtros essenciais.
-- Pesquisa Overpass isolada em módulo próprio para manter os arquivos dentro do limite estrutural de 500 linhas.
-- Teste legado de tint corrigido para o card atualizado sem afrouxar a regra de uso de `app:tint`.
-- Mantidos os recursos da 1.0.40+44: cartões da home, sugestões rápidas 2x2 e busca ampliada de mercados.
-- Nenhuma alteração de identidade Android, banco, backups, assinatura ou Secrets.
+- Nova lista: Supermercado ou Shopping/online, com atalhos de nome adaptados.
+- No Shopping: loja, link clicável, variante, preço à vista, parcelas, entrada, frete, taxas, quantidade paga e data do primeiro vencimento.
+- Comparação de preços entre duas lojas/ofertas, incluindo custos adicionais.
+- Resumos do custo à vista, parcelado e compromisso mensal, aviso de acréscimo total acima de 50%.
+- Conversão manual de listas antigas; suporte a modelos Shopping e backup schema 8 com compatibilidade antiga.
+- Sem alterações do package ID, Secrets ou keystore; dados de supermercado preservados.
 
-**Pendente:** executar o workflow completo no GitHub Actions e testar o APK em aparelho.
+**Importante:** acréscimo total não é taxa mensal/CET. A compilação Gradle, o Android Lint e o teste físico ainda precisam ser executados no CI/aparelho.

@@ -16,6 +16,7 @@ object ListActionsDialog {
         onRename: () -> Unit,
         onDuplicate: () -> Unit,
         onSaveTemplate: () -> Unit,
+        onChangeType: () -> Unit,
         onDelete: () -> Unit
     ) {
         val view = LayoutInflater.from(activity).inflate(R.layout.dialog_list_actions, null)
@@ -37,6 +38,10 @@ object ListActionsDialog {
         view.findViewById<MaterialButton>(R.id.buttonActionTemplate).setOnClickListener {
             dialog.dismiss()
             onSaveTemplate()
+        }
+        view.findViewById<MaterialButton>(R.id.buttonActionType).setOnClickListener {
+            dialog.dismiss()
+            onChangeType()
         }
         view.findViewById<MaterialButton>(R.id.buttonActionDelete).setOnClickListener {
             dialog.dismiss()

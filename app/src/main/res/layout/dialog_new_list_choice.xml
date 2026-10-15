@@ -30,14 +30,14 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:padding="20dp">
             <TextView android:layout_width="54dp" android:layout_height="54dp"
-                android:gravity="center" android:text="✏️" android:textSize="28sp" />
+                android:gravity="center" android:text="🛒" android:textSize="28sp" />
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="Começar do zero" android:textStyle="bold"
+                    android:text="🛒 Supermercado" android:textStyle="bold"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp" android:text="Uma lista vazia com o nome que você escolher."
+                    android:layout_marginTop="5dp" android:text="Mantém pesos, medidas, combos e compras de mercado."
                     android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
             </LinearLayout>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -45,6 +45,29 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardNewShoppingList" style="@style/Widget.ListaCompras.Card"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" android:clickable="true" android:focusable="true"
+        app:cardCornerRadius="24dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:padding="18dp">
+            <TextView android:layout_width="54dp" android:layout_height="54dp"
+                android:gravity="center" android:text="🛍️" android:textSize="28sp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="Shopping e online" android:textStyle="bold"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp" android:text="Links, lojas, ofertas, parcelas e juros."
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+            </LinearLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="›" android:textSize="32sp" android:contentDescription="Abrir Shopping" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardNewFromTemplate" style="@style/Widget.ListaCompras.Card"
         android:layout_width="match_parent" android:layout_height="wrap_content"

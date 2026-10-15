@@ -16,6 +16,7 @@ import com.listadecompras.app.data.ShoppingRepository
 import com.listadecompras.app.model.ComparisonRow
 import com.listadecompras.app.model.ShoppingItem
 import com.listadecompras.app.model.ShoppingList
+import com.listadecompras.app.model.ListType
 import com.listadecompras.app.util.PriceTargetHelper
 import com.listadecompras.app.util.PriceUnitHelper
 import com.listadecompras.app.util.InsetsHelper
@@ -174,10 +175,10 @@ class CompareActivity : AppCompatActivity() {
                     if (item.purchased) {
                         append("Planejado: ${formatQuantity(item.quantity)} ${item.unit}")
                         append(" • comprado: ${formatQuantity(item.purchasedQuantity)} ${item.unit}")
-                        append(" • total pago ${currency.format(item.purchasedSubtotal)}")
+                        append(" • total pago ${currency.format(if (list.listType == ListType.SHOPPING) item.shopPurchasedSubtotal else item.purchasedSubtotal)}")
                     } else {
                         append("Planejado: ${formatQuantity(item.quantity)} ${item.unit}")
-                        append(" • estimado ${currency.format(item.subtotal)}")
+                        append(" • estimado ${currency.format(if (list.listType == ListType.SHOPPING) item.shopFinancedSubtotal else item.subtotal)}")
                     }
                     if (!targetStatus.isNullOrBlank()) append("\n$targetStatus")
                 }

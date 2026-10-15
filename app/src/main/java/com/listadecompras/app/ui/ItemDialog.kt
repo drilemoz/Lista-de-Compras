@@ -24,6 +24,7 @@ import com.listadecompras.app.data.ProductCatalogRepository
 import com.listadecompras.app.model.BarcodeLookupResult
 import com.listadecompras.app.model.CatalogProduct
 import com.listadecompras.app.model.ShoppingItem
+import com.listadecompras.app.model.ListType
 import com.listadecompras.app.util.CurrencyTextWatcher
 import com.listadecompras.app.util.InsetsHelper
 import com.listadecompras.app.util.PriceUnitHelper
@@ -39,6 +40,7 @@ object ItemDialog {
         context: Context,
         catalogRepository: ProductCatalogRepository,
         existing: ShoppingItem? = null,
+        listType: ListType = ListType.SUPERMARKET,
         initialBarcode: String? = null,
         onRequestBarcode: (((String) -> Unit) -> Unit)? = null,
         onSave: (ShoppingItem, String?, Double?, String) -> Unit
@@ -73,6 +75,18 @@ object ItemDialog {
         val comboTotal = view.findViewById<TextInputEditText>(R.id.inputComboTotal)
         val comboCount = view.findViewById<TextInputEditText>(R.id.inputComboUnits)
         val comboPreview = view.findViewById<TextView>(R.id.textComboPreview)
+        val priceWatcher = CurrencyTextWatcher(price)
+        val targetWatcher = CurrencyTextWatcher(targetPrice)
+        price.addTextChangedListener(priceWatcher)
+        targetPrice.addTextChangedListener(targetWatcher)
+        val brazilCurrency = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+        val shopping = listType == ListType.SHOPPING
+        val shopForm = ShoppingFieldsForm(view, priceWatcher, brazilCurrency)
+        shopForm.section.visibility = if (shopping) View.VISIBLE else View.GONE
+        if (shopping) {
+            priceLayout.hint = "Preço à vista por unidade"
+        }
+        price.doAfterTextChanged { if (shopping) shopForm.update() }
         val moreButton = view.findViewById<MaterialButton>(R.id.buttonMoreOptions)
         val moreContainer = view.findViewById<View>(R.id.containerMoreOptions)
         moreButton.setOnClickListener {
@@ -81,7 +95,6 @@ object ItemDialog {
         }
         val comboWatcher = CurrencyTextWatcher(comboTotal)
         comboTotal.addTextChangedListener(comboWatcher)
-        val brazilCurrency = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         val categoryRepository = CategoryRepository(context)
         var categories = categoryRepository.all()
 
@@ -108,11 +121,6 @@ object ItemDialog {
         val buttonCancel = view.findViewById<MaterialButton>(R.id.buttonCancel)
         val buttonSave = view.findViewById<MaterialButton>(R.id.buttonSave)
         val buttonClose = view.findViewById<android.widget.ImageButton>(R.id.buttonCloseSheet)
-        val priceWatcher = CurrencyTextWatcher(price)
-        val targetWatcher = CurrencyTextWatcher(targetPrice)
-        price.addTextChangedListener(priceWatcher)
-        targetPrice.addTextChangedListener(targetWatcher)
-
         val knownProducts = catalogRepository.suggestions()
         val productByDisplayedName = knownProducts.associateBy { it.name }
         name.setAdapter(
@@ -123,7 +131,8 @@ object ItemDialog {
             )
         )
 
-        title.text = if (existing == null) "Adicionar produto" else "Editar produto"
+        title.text = if (shopping) (if (existing == null) "Adicionar compra" else "Editar compra")
+            else (if (existing == null) "Adicionar produto" else "Editar produto")
         subtitle.text = if (existing == null) {
             "Pesquise no catálogo ou adicione um produto."
         } else {
@@ -146,7 +155,7 @@ object ItemDialog {
                 refreshCategories(edited.name)
             }
         }
-        unit.setSimpleItems(units.toTypedArray())
+        unit.setSimpleItems(if (shopping) arrayOf("un", "par", "kit", "peça", "cx", "pct") else units.toTypedArray())
         category.setText(DEFAULT_CATEGORY, false)
         unit.setText(units.first(), false)
 
@@ -216,7 +225,7 @@ object ItemDialog {
             name.setText(product.name, false)
             suppressNameWatcher = false
             category.setText(product.category.ifBlank { DEFAULT_CATEGORY }, false)
-            unit.setText(product.unit.ifBlank { units.first() }, false)
+            unit.setText(if (shopping) "un" else product.unit.ifBlank { units.first() }, false)
             priceLayout.hint = PriceUnitHelper.inputHint(product.unit)
             if (checkSplit.isChecked) {
                 checkSplit.isChecked = false
@@ -224,7 +233,9 @@ object ItemDialog {
                 comboCount.setText("")
             }
             if (product.lastUnitPrice > 0.0) {
-                priceWatcher.setAmount(PriceUnitHelper.editorAmount(product.lastUnitPrice, product.unit))
+                if (!shopping || product.unit !in listOf("kg", "g", "L", "mL")) {
+                    priceWatcher.setAmount(PriceUnitHelper.editorAmount(product.lastUnitPrice, product.unit))
+                }
             }
             targetWatcher.setAmount(product.priceTarget ?: 0.0)
             targetLayout.hint = "Preço-alvo por ${product.priceTargetUnit ?: PriceUnitHelper.priceUnit(product.unit)}"
@@ -292,10 +303,11 @@ object ItemDialog {
                 comboCount.setText(it.comboUnitCount!!.toString())
                 checkSplit.isChecked = true
             }
+            if (shopping) shopForm.restore(it)
             note.setText(it.note)
             if (it.note.isNotBlank()) moreContainer.visibility = View.VISIBLE
             category.setText(it.category, false)
-            unit.setText(it.unit, false)
+            unit.setText(if (shopping && it.unit in listOf("kg", "g", "L", "mL")) "un" else it.unit, false)
             if (!checkSplit.isChecked) priceLayout.hint = PriceUnitHelper.inputHint(it.unit)
             catalogRepository.findByName(it.name)?.let { product ->
                 targetWatcher.setAmount(product.priceTarget ?: 0.0)
@@ -309,6 +321,7 @@ object ItemDialog {
             targetLayout.hint = "Preço-alvo por ${PriceUnitHelper.priceUnit(units.first())}"
         }
         if (moreContainer.visibility == View.VISIBLE) moreButton.text = "Ocultar opções"
+        if (shopping) shopForm.update()
         renderBarcodeStatus()
 
         name.doAfterTextChanged {
@@ -399,6 +412,8 @@ object ItemDialog {
                 return@setOnClickListener
             }
 
+            if (shopping && !shopForm.validate()) return@setOnClickListener
+
             val itemName = name.text?.toString()?.trim().orEmpty()
             if (itemName.isBlank()) {
                 nameLayout.error = "Digite o nome do item"
@@ -444,6 +459,7 @@ object ItemDialog {
                 this.category = categoryValue
                 this.unit = unitValue
                 this.note = note.text?.toString()?.trim().orEmpty()
+                if (shopping) shopForm.applyTo(this)
             }
             onSave(
                 item,

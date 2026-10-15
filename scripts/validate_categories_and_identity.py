@@ -17,7 +17,7 @@ for file in list((main/'java').rglob('*.kt')) + list((root/'app/src/test').rglob
 identity = json.loads((root/'app_identity.json').read_text())
 assert identity['applicationId'] == 'com.listadecompras.app'
 assert identity['technicalName'] == 'listadecompras'
-assert identity['versionName'] == '1.0.41' and identity['versionCode'] == 45
+assert identity['versionName'] == '1.0.42' and identity['versionCode'] == 46
 
 res = main/'res'
 android = '{http://schemas.android.com/apk/res/android}'
@@ -43,7 +43,7 @@ assert 'R.layout.dialog_new_list_choice' in (code/'ui/MainActivity.kt').read_tex
 
 backup = (code/'data/BackupRepository.kt').read_text()
 for clause in ('"lista-de-compras-backup"', '"meu-supermercado-backup"',
-               'SCHEMA_VERSION = 7', 'put("categories"', 'categoryRepository.merge(',
+               'SCHEMA_VERSION = 8', 'put("categories"', 'categoryRepository.merge(',
                'categoryRepository.resetAndMerge('):
     assert clause in backup, clause
 

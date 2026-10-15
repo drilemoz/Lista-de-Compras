@@ -12,6 +12,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.listadecompras.app.R
 import com.listadecompras.app.model.ShoppingList
+import com.listadecompras.app.model.ListType
 import java.text.DateFormat
 import java.text.NumberFormat
 import java.util.Date
@@ -56,7 +57,7 @@ class ShoppingListAdapter(
 
         fun bind(list: ShoppingList) {
             name.text = list.name
-            emoji.text = pickEmoji(list)
+            emoji.text = if (list.listType == ListType.SHOPPING) "🛍️" else pickEmoji(list)
             val count = list.items.size
             meta.text = "Atualizada ${date.format(Date(list.updatedAt))} • $count ${if (count == 1) "item" else "itens"}"
 
@@ -83,12 +84,12 @@ class ShoppingListAdapter(
             total.text = if (list.estimatedTotal > 0.0) currency.format(list.estimatedTotal) else "Sem preços"
 
             val marketName = list.marketName.orEmpty().trim()
-            marketChip.visibility = if (marketName.isBlank()) View.GONE else View.VISIBLE
-            if (marketName.isNotBlank()) {
-                marketChip.text = marketName
-            }
+            marketChip.visibility = if (marketName.isBlank() && list.listType != ListType.SHOPPING) View.GONE else View.VISIBLE
+            marketChip.text = if (list.listType == ListType.SHOPPING) "🛍️ Shopping" else marketName
 
-            hint.text = when {
+            hint.text = if (list.listType == ListType.SHOPPING) {
+                "À vista ${currency.format(list.cashTotal)} • parcelado ${currency.format(list.financedTotal)} • mês ${currency.format(list.monthlyCommitment)}"
+            } else when {
                 count == 0 -> "Toque para adicionar os primeiros produtos"
                 list.budget > 0.0 && list.estimatedTotal > list.budget -> "Acima do orçamento planejado"
                 list.budget > 0.0 && list.estimatedTotal > 0.0 -> "Orçamento ${currency.format(list.budget)} • dentro do planejado"

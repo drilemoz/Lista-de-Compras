@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.42+46 (Supermercado + Shopping com parcelamento)
+
+- Fluxo de criação com dois tipos de lista: Supermercado (existente) e Shopping/online, com sugestões de nomes específicas; modelos continuam disponíveis.
+- Tipo da lista persistido no JSON local, nos modelos e no backup schema 8. Listas antigas são Supermercado por padrão, sem migração destrutiva.
+- Conversão explícita do tipo pela ação da lista, com aviso sobre pesos e unidades ao converter.
+- Editor Shopping com unidades sem kg/g/L/mL, loja, link, variante, frete, taxas, entrada, parcelas, valor da parcela, parcelas pagas e vencimento inicial opcional.
+- Calculadora financeira em BigDecimal: total parcelado, total à vista, diferença em reais, acréscimo percentual total e estimativa de compromisso mensal. Aviso acima de 50% de acréscimo, sem confundir com taxa mensal/CET.
+- Comparação de duas ofertas com valores e links próprios; frete e taxas considerados no total da alternativa.
+- Resumo na lista e no cartão: custo à vista, total parcelado e compromisso mensal. O modo Compra de supermercado fica oculto no Shopping, para não sobrescrever condições financeiras.
+- Campos financeiros opcionais exportados em JSON/CSV e mantidos em modelos e cópias. Links são validados como HTTP(S), sem credenciais incorporadas.
+- Incluídos testes offline e JUnit para parcelamento, entrada, frete, taxas, datas e retrocompatibilidade de totais.
+- Pendente: build Android completo, lint e teste de interface em aparelho.
+
+
 ## 1.0.41+45 (correção do Build 6: validador Overpass)
 
 - Os logs mostraram falha na etapa `Validate source and version`: o teste procurava literalmente `shop="supermarket"`, removido na migração para `shop~"^(supermarket|...)$"` na v1.0.40.

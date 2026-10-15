@@ -23,6 +23,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 class ShoppingItemAdapter(
+    private val isShopping: Boolean = false,
     private val onChecked: (ShoppingItem, Boolean) -> Unit,
     private val onEdit: (ShoppingItem) -> Unit,
     private val onHistory: (ShoppingItem) -> Unit,
@@ -79,9 +80,13 @@ class ShoppingItemAdapter(
                 "Marcar ${item.name} como comprado"
             }
 
-            if (item.unitPrice > 0.0) {
-                totalPrice.text = currency.format(if (item.purchased) item.purchasedSubtotal else item.subtotal)
-                unitPrice.text = PriceUnitHelper.formattedUnitPrice(item, currency)
+            if (item.unitPrice > 0.0 || (isShopping && item.shopFinancedSubtotal > 0.0)) {
+                totalPrice.text = currency.format(if (isShopping) {
+                    if (item.purchased) item.shopPurchasedSubtotal else item.shopFinancedSubtotal
+                } else if (item.purchased) item.purchasedSubtotal else item.subtotal)
+                unitPrice.text = if (isShopping) {
+                    "À vista ${currency.format(item.unitPrice)} • ${item.installmentCount.takeIf { it > 0 }?.let { "$it × ${currency.format(item.installmentAmount)}" } ?: "sem parcelas"}"
+                } else PriceUnitHelper.formattedUnitPrice(item, currency)
             } else {
                 totalPrice.text = "Sem preço"
                 unitPrice.text = "Toque para informar"
@@ -91,8 +96,14 @@ class ShoppingItemAdapter(
             priceTargetStatus.text = targetText.orEmpty()
             priceTargetStatus.visibility = if (targetText.isNullOrBlank()) View.GONE else View.VISIBLE
 
-            note.text = item.note
-            note.visibility = if (item.note.isBlank()) View.GONE else View.VISIBLE
+            note.text = if (isShopping) listOfNotNull(
+                item.storeName.takeIf { it.isNotBlank() },
+                item.variant.takeIf { it.isNotBlank() },
+                item.note.takeIf { it.isNotBlank() },
+                item.shopCalculation?.takeIf { it.extraPercent > 50 }?.let { "⚠ Acréscimo total acima de 50%" },
+                item.productUrl.takeIf { it.isNotBlank() }?.let { "🔗 Link salvo" }
+            ).joinToString(" • ") else item.note
+            note.visibility = if (note.text.isBlank()) View.GONE else View.VISIBLE
 
             name.paintFlags = if (item.purchased) {
                 name.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -106,11 +117,19 @@ class ShoppingItemAdapter(
             more.setOnClickListener { anchor ->
                 PopupMenu(anchor.context, anchor).apply {
                     menu.add("Editar")
+                    if (isShopping && item.productUrl.isNotBlank()) menu.add("Abrir link do produto")
                     menu.add("Histórico de preço")
                     menu.add("Excluir")
                     setOnMenuItemClickListener { menuItem ->
                         when (menuItem.title.toString()) {
                             "Editar" -> onEdit(item)
+                            "Abrir link do produto" -> {
+                                if (com.listadecompras.app.util.InstallmentCalculator.validUrl(item.productUrl)) {
+                                    val url = android.net.Uri.parse(item.productUrl)
+                                    runCatching { anchor.context.startActivity(
+                                        android.content.Intent(android.content.Intent.ACTION_VIEW, url)) }
+                                }
+                            }
                             "Histórico de preço" -> onHistory(item)
                             "Excluir" -> onDelete(item)
                         }

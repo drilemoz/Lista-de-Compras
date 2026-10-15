@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.41+45`
+`1.0.42+46`
 
 ## Identidade técnica
 
@@ -17,6 +17,14 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.42+46 (duas modalidades)
+
+A tela **Nova lista** oferece Supermercado e Shopping/online. Supermercado mantém pesos, volumes, combos, modo Compra e catálogo. Shopping mostra loja, link, variante e formas de pagamento sem pesos. Cada produto aceita preço à vista e parcelamento, entrada, frete, taxas, parcelas já pagas e primeiro vencimento opcional; o total e o acréscimo percentual são recalculados automaticamente. Um segundo conjunto de loja/link/preços permite comparação de ofertas.
+
+**Significado dos valores:** a diferença percentual exibida é o **acréscimo total sobre o preço à vista + frete**, não é juros mensais, juros anuais ou Custo Efetivo Total. O valor mensal é a soma dos valores das parcelas ainda não quitadas dos planos cadastrados, assumindo que coincidam no mês, sem calendário consolidado. O próximo vencimento considera intervalo mensal a partir da data informada. O aplicativo não processa pagamentos nem cria cobranças.
+
+**Compatibilidade:** `applicationId=com.listadecompras.app`, assinatura e Secrets mantidos; backup agora é schema 8 e aceita formatos anteriores. As listas existentes são consideradas Supermercado até serem convertidas explicitamente. Faça backup antes de instalar e teste a atualização no GitHub Actions.
 
 ## Atualização 1.0.41+45 (correção do Build 6)
 
