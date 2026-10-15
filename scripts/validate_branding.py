@@ -28,7 +28,7 @@ assert 'lista_compras_markets' in (app / 'java/com/listadecompras/app/data/Marke
 backup = (app / 'java/com/listadecompras/app/data/BackupRepository.kt').read_text()
 assert 'private const val BACKUP_FORMAT = "lista-de-compras-backup"' in backup
 assert 'private const val LEGACY_BACKUP_FORMAT = "meu-supermercado-backup"' in backup
-assert 'const val SCHEMA_VERSION = 8' in backup
+assert 'const val SCHEMA_VERSION = 9' in backup
 assert 'put("categories", JSONArray()' in backup
 assert 'root.optString("format") !in setOf(BACKUP_FORMAT, LEGACY_BACKUP_FORMAT)' in backup
 assert 'categoryRepository.resetAndMerge(snapshot.categories)' in backup
@@ -44,4 +44,4 @@ assert 'cardNewFromTemplate' in main
 workflow = (root/'.github/workflows/android-release.yml').read_text()
 assert 'LISTA_COMPRAS_KEYSTORE_PATH' in (root/'scripts/resolve_signing.sh').read_text() and 'LISTA_MERCADO_KEYSTORE_BASE64' in workflow
 assert 'Lista-de-Compras-v${VERSION_NAME}.apk' in workflow
-print('Identidade 1.0.43, SQLite categorias, listas aprimoradas e backups antigo/novo: OK')
+print('Identidade 1.0.44, SQLite categorias, listas aprimoradas e backups antigo/novo: OK')

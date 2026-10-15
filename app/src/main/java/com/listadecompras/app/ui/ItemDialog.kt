@@ -1,5 +1,4 @@
 package com.listadecompras.app.ui
-
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +19,7 @@ import com.listadecompras.app.R
 import com.listadecompras.app.data.BarcodeLookupRepository
 import com.listadecompras.app.data.CategoryRepository
 import com.listadecompras.app.data.PurchaseCategory
+import com.listadecompras.app.data.ProductImages
 import com.listadecompras.app.data.ProductCatalogRepository
 import com.listadecompras.app.model.BarcodeLookupResult
 import com.listadecompras.app.model.CatalogProduct
@@ -31,11 +31,9 @@ import com.listadecompras.app.util.PriceUnitHelper
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
-
 object ItemDialog {
     private const val DEFAULT_CATEGORY = "Outros"
     private val units = listOf("un", "kg", "g", "L", "mL", "pct", "pacote", "lata", "cx")
-
     fun show(
         context: Context,
         catalogRepository: ProductCatalogRepository,
@@ -43,6 +41,7 @@ object ItemDialog {
         listType: ListType = ListType.SUPERMARKET,
         initialBarcode: String? = null,
         onRequestBarcode: (((String) -> Unit) -> Unit)? = null,
+        onRequestPhoto: ((Boolean, (String) -> Unit) -> Unit)? = null,
         onSave: (ShoppingItem, String?, Double?, String) -> Unit
     ) {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_item, null)
@@ -59,6 +58,25 @@ object ItemDialog {
         val purchasedQuantityLayout = view.findViewById<TextInputLayout>(R.id.layoutPurchasedQuantity)
         val priceLayout = view.findViewById<TextInputLayout>(R.id.layoutPrice)
         val targetLayout = view.findViewById<TextInputLayout>(R.id.layoutPriceTarget)
+        val photoPreview = view.findViewById<android.widget.ImageView>(R.id.imageItemPhoto)
+        var selectedImage = existing?.imageFile.orEmpty()
+        fun updatePhotoPreview() {
+            val bmp = ProductImages.decode(context, selectedImage)
+            photoPreview.setImageBitmap(bmp)
+            if (bmp == null) {
+                photoPreview.setImageResource(android.R.drawable.ic_menu_camera)
+            }
+        }
+        updatePhotoPreview()
+        view.findViewById<MaterialButton>(R.id.buttonItemGallery).setOnClickListener {
+            onRequestPhoto?.invoke(false) { image -> selectedImage = image; updatePhotoPreview() }
+        }
+        view.findViewById<MaterialButton>(R.id.buttonItemCamera).setOnClickListener {
+            onRequestPhoto?.invoke(true) { image -> selectedImage = image; updatePhotoPreview() }
+        }
+        view.findViewById<MaterialButton>(R.id.buttonItemRemovePhoto).setOnClickListener {
+            selectedImage = ""; updatePhotoPreview()
+        }
         val name = view.findViewById<MaterialAutoCompleteTextView>(R.id.inputName)
         val quantity = view.findViewById<TextInputEditText>(R.id.inputQuantity)
         val purchasedQuantity = view.findViewById<TextInputEditText>(R.id.inputPurchasedQuantity)
@@ -97,7 +115,6 @@ object ItemDialog {
         comboTotal.addTextChangedListener(comboWatcher)
         val categoryRepository = CategoryRepository(context)
         var categories = categoryRepository.all()
-
         fun refreshCategories(selectedName: String? = null) {
             categories = categoryRepository.all()
             val adapter = object : ArrayAdapter<PurchaseCategory>(context, android.R.layout.simple_dropdown_item_1line, categories) {
@@ -130,7 +147,6 @@ object ItemDialog {
                 knownProducts.map { it.name }
             )
         )
-
         title.text = if (shopping) (if (existing == null) "Adicionar compra" else "Editar compra")
             else (if (existing == null) "Adicionar produto" else "Editar produto")
         subtitle.text = if (existing == null) {
@@ -138,7 +154,6 @@ object ItemDialog {
         } else {
             "Altere os dados sem perder o histórico da lista."
         }
-
         refreshCategories(DEFAULT_CATEGORY)
         category.doAfterTextChanged {
             val selected = category.text?.toString()?.trim().orEmpty()
@@ -158,7 +173,6 @@ object ItemDialog {
         unit.setSimpleItems(if (shopping) arrayOf("un", "par", "kit", "peça", "cx", "pct") else units.toTypedArray())
         category.setText(DEFAULT_CATEGORY, false)
         unit.setText(units.first(), false)
-
         var selectedBarcode: String? = existing
             ?.let { catalogRepository.findByName(it.name)?.barcode }
         var scannedUnknownBarcode: String? = null
@@ -166,7 +180,6 @@ object ItemDialog {
         var pendingLookupBarcode: String? = null
         var suppressNameWatcher = false
         var statusMessage: String? = null
-
         fun updateSplitPreview() {
             if (!checkSplit.isChecked) return
             val total = comboWatcher.amount()
@@ -194,20 +207,17 @@ object ItemDialog {
         }
         comboTotal.doAfterTextChanged { updateSplitPreview() }
         comboCount.doAfterTextChanged { updateSplitPreview() }
-
         fun setLookupStatus(message: String?, visibleWhenEmpty: Boolean = false) {
             statusMessage = message
             lookupStatus.text = message.orEmpty()
             lookupStatus.visibility = if (message.isNullOrBlank() && !visibleWhenEmpty) View.GONE else View.VISIBLE
         }
-
         fun setLookupLoading(isLoading: Boolean) {
             lookupProgress.visibility = if (isLoading) View.VISIBLE else View.GONE
             if (isLoading) {
                 setLookupStatus("Consultando nome do produto...", visibleWhenEmpty = true)
             }
         }
-
         fun renderBarcodeStatus(isNew: Boolean = false, fromCatalog: Boolean = false) {
             val code = selectedBarcode.orEmpty()
             barcodeStatus.text = when {
@@ -217,7 +227,6 @@ object ItemDialog {
                 else -> "Código associado • $code"
             }
         }
-
         fun applyCatalogProduct(product: CatalogProduct) {
             pendingLookupBarcode = null
             setLookupLoading(false)
@@ -459,6 +468,7 @@ object ItemDialog {
                 this.category = categoryValue
                 this.unit = unitValue
                 this.note = note.text?.toString()?.trim().orEmpty()
+                this.imageFile = selectedImage
                 if (shopping) shopForm.applyTo(this)
             }
             onSave(

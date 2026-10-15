@@ -48,6 +48,29 @@
                 android:text="PRODUTO" android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
                 android:textColor="?attr/colorPrimary" android:layout_marginBottom="8dp" />
 
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center_vertical" android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+                <ImageView android:id="@+id/imageItemPhoto" android:layout_width="64dp"
+                    android:layout_height="64dp" android:scaleType="centerCrop"
+                    android:contentDescription="Imagem do produto" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="10dp" android:orientation="vertical">
+                    <com.google.android.material.button.MaterialButton android:id="@+id/buttonItemGallery"
+                        style="@style/Widget.ListaCompras.Button.Outlined" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:text="Escolher foto" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <com.google.android.material.button.MaterialButton android:id="@+id/buttonItemCamera"
+                            style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="Câmera" />
+                        <com.google.android.material.button.MaterialButton android:id="@+id/buttonItemRemovePhoto"
+                            style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="Remover" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutName" style="@style/Widget.ListaCompras.Field.Outlined"
                 android:layout_width="match_parent" android:layout_height="wrap_content"

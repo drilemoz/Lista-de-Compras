@@ -14,6 +14,7 @@ data class ShoppingItem(
     var comboTotalPrice: Double? = null,
     /** Número de unidades na promoção. Nulo em produtos sem combo. */
     var comboUnitCount: Int? = null,
+    var imageFile: String = "",
     var productUrl: String = "",
     var storeName: String = "",
     var variant: String = "",

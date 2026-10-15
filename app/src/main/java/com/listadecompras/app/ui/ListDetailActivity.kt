@@ -24,6 +24,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputLayout
 import com.listadecompras.app.R
 import com.listadecompras.app.data.ProductCatalogRepository
+import com.listadecompras.app.data.ProductImages
 import com.listadecompras.app.data.ShoppingRepository
 import com.listadecompras.app.model.ShoppingItem
 import com.listadecompras.app.model.ShoppingList
@@ -59,6 +60,13 @@ class ListDetailActivity : AppCompatActivity() {
     private var pendingBarcodeConsumer: ((String) -> Unit)? = null
     private var pendingBarcodeTarget: String = BARCODE_TARGET_NONE
     private var pendingBarcodeItemId: Long = -1L
+    private lateinit var photos: ProductPhotoCoordinator
+    private fun openItemDetails(item: ShoppingItem) {
+        startActivity(Intent(this, ProductDetailsActivity::class.java)
+            .putExtra(ProductDetailsActivity.EXTRA_LIST_ID, current.id)
+            .putExtra(ProductDetailsActivity.EXTRA_ITEM_ID, item.id))
+    }
+
     private val purchaseModeLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -105,6 +113,8 @@ class ListDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         pendingBarcodeTarget = savedInstanceState?.getString(STATE_BARCODE_TARGET) ?: BARCODE_TARGET_NONE
         pendingBarcodeItemId = savedInstanceState?.getLong(STATE_BARCODE_ITEM_ID, -1L) ?: -1L
+        photos = ProductPhotoCoordinator(this)
+        photos.restoreState(savedInstanceState)
         ThemeController.applySavedMode(this)
         setContentView(R.layout.activity_list_detail)
 
@@ -158,6 +168,7 @@ class ListDetailActivity : AppCompatActivity() {
                 }
             },
             onEdit = { editItem(it) },
+            onOpen = { openItemDetails(it) },
             onHistory = { openPriceHistory(it) },
             onDelete = { confirmDelete(it) }
         )
@@ -249,6 +260,11 @@ class ListDetailActivity : AppCompatActivity() {
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::repository.isInitialized && ::current.isInitialized) reloadCurrentList()
+    }
+
     private fun reloadCurrentList() {
         if (!::current.isInitialized) return
         val currentId = current.id
@@ -287,7 +303,8 @@ class ListDetailActivity : AppCompatActivity() {
         catalogRepository = catalogRepository,
         listType = current.listType,
         initialBarcode = initialBarcode,
-        onRequestBarcode = { consumer -> requestBarcode(BARCODE_TARGET_ADD, -1L, consumer) }
+        onRequestBarcode = { consumer -> requestBarcode(BARCODE_TARGET_ADD, -1L, consumer) },
+        onRequestPhoto = { camera, consumer -> photos.request(camera, consumer) }
     ) { newItem, barcode, priceTarget, targetUnit ->
         current.items += newItem
         catalogRepository.recordItem(newItem, barcode)
@@ -301,7 +318,8 @@ class ListDetailActivity : AppCompatActivity() {
         existing = item,
         listType = current.listType,
         initialBarcode = initialBarcode,
-        onRequestBarcode = { consumer -> requestBarcode(BARCODE_TARGET_EDIT, item.id, consumer) }
+        onRequestBarcode = { consumer -> requestBarcode(BARCODE_TARGET_EDIT, item.id, consumer) },
+        onRequestPhoto = { camera, consumer -> photos.request(camera, consumer) }
     ) { edited, barcode, priceTarget, targetUnit ->
         val index = current.items.indexOfFirst { it.id == item.id }
         if (index >= 0) current.items[index] = edited
@@ -352,6 +370,7 @@ class ListDetailActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        photos.saveState(outState)
         outState.putString(STATE_BARCODE_TARGET, pendingBarcodeTarget)
         outState.putLong(STATE_BARCODE_ITEM_ID, pendingBarcodeItemId)
         super.onSaveInstanceState(outState)

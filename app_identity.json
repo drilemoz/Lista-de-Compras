@@ -2,8 +2,8 @@
   "publicName": "Lista de Compras",
   "technicalName": "listadecompras",
   "applicationId": "com.listadecompras.app",
-  "versionName": "1.0.43",
-  "versionCode": 47,
+  "versionName": "1.0.44",
+  "versionCode": 48,
   "platform": "Android",
   "framework": "Android nativo",
   "language": "Kotlin"

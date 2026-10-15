@@ -2,15 +2,15 @@
   "product": "Lista de Compras",
   "name": "listadecompras",
   "displayName": "Lista de Compras",
-  "version": "1.0.43+47",
+  "version": "1.0.44+48",
   "packageFormat": 2,
   "projectType": "android-app",
   "framework": "android-native",
   "language": "kotlin",
   "android": {
     "applicationId": "com.listadecompras.app",
-    "versionName": "1.0.43",
-    "versionCode": 47,
+    "versionName": "1.0.44",
+    "versionCode": 48,
     "minSdk": 26,
     "targetSdk": 35,
     "compileSdk": 35

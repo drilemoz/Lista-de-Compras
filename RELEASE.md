@@ -1,8 +1,10 @@
-# Lista de Compras 1.0.43+47
+# Lista de Compras 1.0.44+48
 
-- Corrigido Build 8: compilação Kotlin falhou com três `Unresolved reference 'orEmpty'` em `ShoppingFieldsForm.kt:143` ao validar loja, variante e loja alternativa.
-- A leitura agora converte o texto editável (`Editable`) em `String` antes de verificar o tamanho máximo de 120 caracteres.
-- Validador de regressão do modo Shopping atualizado para identificar o padrão inválido.
-- Mantidos Supermercado e Shopping, parcelamento, comparações, backup schema 8, identificador Android e assinatura existentes.
+- Tela de detalhes do produto (somente visualização), acessível ao tocar em qualquer card.
+- Foto opcional por galeria/câmera; miniatura na lista e edição/remoção direta.
+- Links da loja mais acessíveis: abrir, copiar e compartilhar. Oferta alternativa também abre em navegador.
+- Parcelamento e comparação nos detalhes, com aviso claro sobre acréscimo total acima de 50%.
+- Backup em ZIP com JSON schema 9 e JPEGs; leitura de JSON legado preservada.
+- Dados, IDs de itens, fórmulas financeiras e assinatura Android mantidos.
 
-**Pendente:** executar novamente o workflow GitHub Actions para confirmar `:app:compileDebugKotlin`, testes, Lint, APK Debug e Release assinada.
+**A validar:** `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug`, seleção de mídia e teste de exportação/restauração no aparelho.

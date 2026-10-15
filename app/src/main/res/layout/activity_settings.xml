@@ -108,7 +108,7 @@
             <LinearLayout android:id="@+id/rowExportBackup" android:layout_width="match_parent" android:layout_height="76dp" android:gravity="center_vertical" android:paddingHorizontal="16dp" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" android:orientation="horizontal">
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Exportar backup" android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Listas, itens, preços, orçamento e catálogo em JSON" android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Backup ZIP com dados e fotos dos produtos" android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
                 </LinearLayout>
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
             </LinearLayout>
@@ -118,7 +118,7 @@
             <LinearLayout android:id="@+id/rowImportBackup" android:layout_width="match_parent" android:layout_height="76dp" android:gravity="center_vertical" android:paddingHorizontal="16dp" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" android:orientation="horizontal">
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Importar backup" android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Valida o arquivo e permite mesclar ou substituir" android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Importa ZIP com fotos ou JSON antigo" android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
                 </LinearLayout>
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
             </LinearLayout>

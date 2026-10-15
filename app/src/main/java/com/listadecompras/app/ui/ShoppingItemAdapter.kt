@@ -4,6 +4,7 @@ import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.listadecompras.app.R
+import com.listadecompras.app.data.ProductImages
 import com.listadecompras.app.data.CategoryRepository
 import com.listadecompras.app.model.CatalogProduct
 import com.listadecompras.app.model.ShoppingItem
@@ -26,6 +28,7 @@ class ShoppingItemAdapter(
     private val isShopping: Boolean = false,
     private val onChecked: (ShoppingItem, Boolean) -> Unit,
     private val onEdit: (ShoppingItem) -> Unit,
+    private val onOpen: (ShoppingItem) -> Unit,
     private val onHistory: (ShoppingItem) -> Unit,
     private val onDelete: (ShoppingItem) -> Unit
 ) : ListAdapter<ShoppingItemAdapter.Row, ShoppingItemAdapter.Holder>(Diff) {
@@ -53,6 +56,7 @@ class ShoppingItemAdapter(
     override fun onBindViewHolder(holder: Holder, position: Int) = holder.bind(getItem(position))
 
     inner class Holder(view: View) : RecyclerView.ViewHolder(view) {
+        private val thumbnail: ImageView = view.findViewById(R.id.imageProductThumbnail)
         private val check: MaterialCheckBox = view.findViewById(R.id.checkPurchased)
         private val name: TextView = view.findViewById(R.id.textName)
         private val meta: TextView = view.findViewById(R.id.textMeta)
@@ -68,6 +72,9 @@ class ShoppingItemAdapter(
             check.setOnCheckedChangeListener(null)
             check.isChecked = item.purchased
             name.text = item.name
+            val bitmap = ProductImages.decodeThumbnail(itemView.context, item.imageFile)
+            thumbnail.setImageBitmap(bitmap)
+            thumbnail.visibility = if (bitmap == null) View.GONE else View.VISIBLE
             meta.text = if (item.purchased) {
                 "${quantityFormat.format(item.quantity)} ${item.unit} planejados • ${quantityFormat.format(item.purchasedQuantity)} ${item.unit} comprados"
             } else {
@@ -113,15 +120,17 @@ class ShoppingItemAdapter(
             itemView.alpha = if (item.purchased) 0.68f else 1f
 
             check.setOnCheckedChangeListener { _, checked -> onChecked(item, checked) }
-            itemView.setOnClickListener { onEdit(item) }
+            itemView.setOnClickListener { onOpen(item) }
             more.setOnClickListener { anchor ->
                 PopupMenu(anchor.context, anchor).apply {
+                    menu.add("Ver detalhes")
                     menu.add("Editar")
                     if (isShopping && item.productUrl.isNotBlank()) menu.add("Abrir link do produto")
                     menu.add("Histórico de preço")
                     menu.add("Excluir")
                     setOnMenuItemClickListener { menuItem ->
                         when (menuItem.title.toString()) {
+                            "Ver detalhes" -> onOpen(item)
                             "Editar" -> onEdit(item)
                             "Abrir link do produto" -> {
                                 if (com.listadecompras.app.util.InstallmentCalculator.validUrl(item.productUrl)) {

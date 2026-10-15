@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.44+48 (detalhes, fotos e backup ZIP)
+
+- Nova `ProductDetailsActivity` somente leitura ao tocar no card, com ação explícita para editar e exibição de valores, notas, parcelas, vencimentos e comparação.
+- Links do anúncio principal e da segunda oferta acessíveis sem editar: abrir no navegador, copiar ou compartilhar; URLs HTTP(S) continuam validadas.
+- Seleção de foto na galeria e captura pela câmera com `FileProvider`, armazenamento privado, JPEG redimensionado e miniatura nos cards.
+- Campo de imagem no editor de itens, disponível em Supermercado e Shopping, com botões galeria/câmera/remover.
+- Formato de backup atualizado para ZIP: `backup.json` schema 9 mais imagens JPEG locais; leitor mantém suporte aos arquivos JSON legados e valida conteúdo/nome/tamanho dos arquivos no ZIP.
+- Lógica de importação mantém IDs existentes e não substitui listas sem confirmação de mesclar/substituir; fotos são restauradas quando o usuário confirma.
+- `versionName`, `versionCode`, README, changelog, notas da versão, identidade e tela Novidades sincronizados.
+- Testes de integração Android e lint pendentes de execução no GitHub Actions.
+
 ## 1.0.43+47 (correção do Build 8: Kotlin ShoppingFieldsForm)
 
 - Corrigidas três referências `orEmpty()` inválidas em `ShoppingFieldsForm.kt:143` que impediam `:app:compileDebugKotlin` no Build 8.

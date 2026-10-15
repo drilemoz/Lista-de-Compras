@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.43+47`
+`1.0.44+48`
 
 ## Identidade técnica
 
@@ -17,6 +17,15 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.44+48 (detalhes e fotos de produtos)
+
+- Ao tocar no produto, abre-se a **tela de detalhes somente leitura**, com foto, preços, parcelamento, outras ofertas e observações. O botão Editar permanece disponível.
+- Novas ações de link no modo Shopping, inclusive para ofertas alternativas: abrir anúncio no navegador; o principal também pode ser copiado e compartilhado.
+- Cadastro e edição aceitam foto opcional da galeria ou câmera. A imagem é comprimida para armazenamento local privado e aparece como miniatura na lista e em tamanho grande nos detalhes.
+- **Backup de dados passa a ser ZIP**, com `backup.json` (schema 9) e imagens em `images/`. O importador continua aceitando arquivos JSON antigos sem imagens.
+- Cuidado: o arquivo ZIP de backup pode ser maior que antes. Não armazene credenciais ou segredos nas fotos.
+- As listas antigas e os campos de Supermercado/Shopping continuam sem mudança de identificador ou banco.
 
 ## Atualização 1.0.43+47 (correção do Build 8)
 
@@ -31,7 +40,7 @@ A tela **Nova lista** oferece Supermercado e Shopping/online. Supermercado mant�
 
 **Significado dos valores:** a diferença percentual exibida é o **acréscimo total sobre o preço à vista + frete**, não é juros mensais, juros anuais ou Custo Efetivo Total. O valor mensal é a soma dos valores das parcelas ainda não quitadas dos planos cadastrados, assumindo que coincidam no mês, sem calendário consolidado. O próximo vencimento considera intervalo mensal a partir da data informada. O aplicativo não processa pagamentos nem cria cobranças.
 
-**Compatibilidade:** `applicationId=com.listadecompras.app`, assinatura e Secrets mantidos; backup agora é schema 8 e aceita formatos anteriores. As listas existentes são consideradas Supermercado até serem convertidas explicitamente. Faça backup antes de instalar e teste a atualização no GitHub Actions.
+**Compatibilidade:** `applicationId=com.listadecompras.app`, assinatura e Secrets mantidos; backup agora usa ZIP com JSON schema 9 e fotos, aceitando importação dos formatos JSON anteriores. As listas existentes são consideradas Supermercado até serem convertidas explicitamente. Faça backup antes de instalar e teste a atualização no GitHub Actions.
 
 ## Atualização 1.0.41+45 (correção do Build 6)
 

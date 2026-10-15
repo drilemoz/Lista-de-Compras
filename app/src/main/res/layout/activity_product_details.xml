@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootProductDetails"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_vertical" android:orientation="horizontal">
+            <ImageButton android:id="@+id/buttonBackProduct" android:layout_width="48dp"
+                android:layout_height="48dp" android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp" android:contentDescription="Voltar" android:src="@drawable/ic_back" />
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Detalhes do produto" android:textStyle="bold"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/buttonEditProduct"
+                style="@style/Widget.ListaCompras.Button.Tonal"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Editar" />
+        </LinearLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="220dp"
+            android:layout_marginTop="12dp" android:background="?attr/colorSurfaceContainerLow">
+            <ImageView android:id="@+id/imageProductDetails" android:layout_width="match_parent"
+                android:layout_height="match_parent" android:scaleType="centerCrop"
+                android:contentDescription="Foto do produto" />
+            <TextView android:id="@+id/textImagePlaceholder" android:layout_width="match_parent"
+                android:layout_height="match_parent" android:gravity="center" android:text="📷  Sem foto"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+        </FrameLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/buttonGalleryProduct"
+                style="@style/Widget.ListaCompras.Button.Outlined" android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1" android:text="Galeria" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/buttonCameraProduct"
+                style="@style/Widget.ListaCompras.Button.Outlined" android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp"
+                android:text="Câmera" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/buttonRemovePhoto"
+                style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="Remover" />
+        </LinearLayout>
+        <TextView android:id="@+id/textProductName" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="20dp" android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
+        <TextView android:id="@+id/textProductMeta" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="6dp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        <com.google.android.material.card.MaterialCardView style="@style/Widget.ListaCompras.Card.Subtle"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:padding="16dp" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="PREÇOS E PAGAMENTO" android:textColor="?attr/colorPrimary"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+                <TextView android:id="@+id/textProductPayment" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="10dp"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+                <TextView android:id="@+id/textProductWarning" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="9dp"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textColor="?attr/colorError" android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <TextView android:id="@+id/textProductNotes" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+        <com.google.android.material.card.MaterialCardView style="@style/Widget.ListaCompras.Card"
+            android:id="@+id/cardProductLinks" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="LINKS DAS LOJAS" android:textStyle="bold"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/buttonOpenProductUrl"
+                    style="@style/Widget.ListaCompras.Button.Filled" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                    android:text="Abrir anúncio" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/buttonCopyProductUrl"
+                    style="@style/Widget.ListaCompras.Button.Outlined" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="Copiar link" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/buttonShareProductUrl"
+                    style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="Compartilhar link" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/buttonOpenAlternativeUrl"
+                    style="@style/Widget.ListaCompras.Button.Outlined" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="Abrir oferta alternativa" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/buttonCopyAlternativeUrl"
+                    style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="Copiar link alternativo" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/buttonShareAlternativeUrl"
+                    style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="Compartilhar outra oferta" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

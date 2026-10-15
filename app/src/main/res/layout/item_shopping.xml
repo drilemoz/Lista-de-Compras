@@ -24,6 +24,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="Marcar como comprado" />
+        <ImageView android:id="@+id/imageProductThumbnail"
+            android:layout_width="54dp" android:layout_height="54dp"
+            android:scaleType="centerCrop" android:contentDescription="Imagem do produto"
+            android:visibility="gone" />
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"

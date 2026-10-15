@@ -14,6 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.listadecompras.app.BuildConfig
 import com.listadecompras.app.R
+import com.listadecompras.app.data.ProductBackupArchive
 import com.listadecompras.app.data.BackupRepository
 import com.listadecompras.app.data.CategoryRepository
 import com.listadecompras.app.data.MarketPreferencesRepository
@@ -31,9 +32,10 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var settings: SettingsRepository
     private lateinit var appearanceValue: TextView
     private lateinit var backupRepository: BackupRepository
+    private var pendingPhotos: Map<String, ByteArray> = emptyMap()
 
     private val exportBackupLauncher = registerForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json")
+        ActivityResultContracts.CreateDocument("application/zip")
     ) { uri -> uri?.let { exportJsonBackup(it) } }
 
     private val exportCsvLauncher = registerForActivityResult(
@@ -66,10 +68,10 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(android.content.Intent(this, CatalogActivity::class.java))
         }
         findViewById<View>(R.id.rowExportBackup).setOnClickListener {
-            exportBackupLauncher.launch("Lista-de-Compras-backup-${fileDate()}.json")
+            exportBackupLauncher.launch("Lista-de-Compras-backup-${fileDate()}.zip")
         }
         findViewById<View>(R.id.rowImportBackup).setOnClickListener {
-            importBackupLauncher.launch(arrayOf("application/json", "text/json", "text/plain"))
+            importBackupLauncher.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/json", "text/json", "text/plain", "application/octet-stream"))
         }
         findViewById<View>(R.id.rowExportCsv).setOnClickListener {
             exportCsvLauncher.launch("Lista-de-Compras-dados-${fileDate()}.csv")
@@ -99,11 +101,14 @@ class SettingsActivity : AppCompatActivity() {
     private fun exportJsonBackup(uri: Uri) {
         runCatching {
             val json = backupRepository.createJsonBackup()
-            contentResolver.openOutputStream(uri, "w")?.bufferedWriter(Charsets.UTF_8)?.use { writer ->
-                writer.write(json)
+            val lists = ShoppingRepository(this).loadLists()
+            val templates = TemplateRepository(this).loadUserTemplates()
+            val items = lists.flatMap { it.items } + templates.flatMap { it.items }
+            contentResolver.openOutputStream(uri, "w")?.use { stream ->
+                ProductBackupArchive.write(this, json, items, stream)
             } ?: error("Não foi possível abrir o arquivo escolhido.")
         }.onSuccess {
-            message("Backup exportado com sucesso")
+            message("Backup ZIP com fotos exportado")
         }.onFailure {
             showFileError("Não foi possível exportar o backup", it)
         }
@@ -124,12 +129,28 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun readBackupForImport(uri: Uri) {
         runCatching {
-            val raw = contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
-                ?: error("Não foi possível abrir o arquivo selecionado.")
-            backupRepository.parseAndValidate(raw)
+            val input = contentResolver.openInputStream(uri) ?: error("Não foi possível abrir o arquivo selecionado.")
+            val header = input.buffered().use { source ->
+                source.mark(4)
+                val magic = ByteArray(4)
+                val read = source.read(magic)
+                source.reset()
+                val archive = if (read == 4 && magic[0] == 0x50.toByte() && magic[1] == 0x4B.toByte())
+                    ProductBackupArchive.read(source) else ProductBackupArchive.Imported(
+                    source.bufferedReader(Charsets.UTF_8).readText(), emptyMap())
+                archive
+            }
+            val snapshot = backupRepository.parseAndValidate(header.json)
+            val needed = ProductBackupArchive.referencedImages(
+                snapshot.lists.flatMap { it.items } + snapshot.templates.flatMap { it.items })
+            if (header.images.isNotEmpty()) ProductBackupArchive.verify(header, needed)
+            else require(needed.isEmpty()) { "Este JSON tem referências a fotos, mas não inclui os arquivos. Importe o backup ZIP completo." }
+            pendingPhotos = header.images
+            snapshot
         }.onSuccess { snapshot ->
             showImportSummary(snapshot)
         }.onFailure {
+            pendingPhotos = emptyMap()
             showFileError("Backup inválido", it)
         }
     }
@@ -167,8 +188,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun performImport(snapshot: BackupRepository.BackupSnapshot, replace: Boolean) {
         runCatching {
+            ProductBackupArchive.restoreImages(this, pendingPhotos)
             if (replace) backupRepository.replaceWith(snapshot) else backupRepository.mergeWith(snapshot)
         }.onSuccess {
+            pendingPhotos = emptyMap()
             message(if (replace) "Backup restaurado" else "Backup mesclado")
         }.onFailure {
             showFileError("Não foi possível importar o backup", it)

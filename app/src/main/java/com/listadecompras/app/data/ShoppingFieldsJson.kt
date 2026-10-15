@@ -6,6 +6,7 @@ import org.json.JSONObject
 
 /** Shared versioned optional fields; old JSON remains valid with supermarket defaults. */
 internal fun JSONObject.putShoppingFields(item: ShoppingItem): JSONObject = apply {
+    put("imageFile", item.imageFile)
     put("productUrl", item.productUrl)
     put("storeName", item.storeName)
     put("variant", item.variant)
@@ -27,6 +28,7 @@ internal fun JSONObject.putShoppingFields(item: ShoppingItem): JSONObject = appl
 }
 
 internal fun ShoppingItem.readShoppingFields(json: JSONObject, strict: Boolean = false): ShoppingItem = apply {
+    imageFile = json.optString("imageFile", "")
     productUrl = json.optString("productUrl", "")
     storeName = json.optString("storeName", "")
     variant = json.optString("variant", "")
@@ -46,6 +48,7 @@ internal fun ShoppingItem.readShoppingFields(json: JSONObject, strict: Boolean =
     alternativeShipping = json.optDouble("alternativeShipping", 0.0)
     alternativeFees = json.optDouble("alternativeFees", 0.0)
     if (strict) {
+        require(ProductImages.validName(imageFile)) { "Nome da imagem inválido no backup." }
         require(InstallmentCalculator.validUrl(productUrl) && InstallmentCalculator.validUrl(alternativeUrl)) {
             "O backup contém um link de produto inválido."
         }

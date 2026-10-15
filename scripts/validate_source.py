@@ -351,7 +351,7 @@ if "item.purchasedSubtotal" not in compare_source or "comprado:" not in compare_
     raise SystemExit("Price history must show actual purchased quantity and paid total")
 
 backup_source = (root / "app/src/main/java/com/listadecompras/app/data/BackupRepository.kt").read_text(encoding="utf-8")
-if 'const val SCHEMA_VERSION = 8' not in backup_source or '"meu-supermercado-backup"' not in backup_source:
+if 'const val SCHEMA_VERSION = 9' not in backup_source or '"meu-supermercado-backup"' not in backup_source:
     raise SystemExit("Versioned JSON backup format is missing")
 if 'put("templates",' not in backup_source or 'put("favorite", favorite)' not in backup_source or 'put("recurringFrequency", recurringFrequency' not in backup_source:
     raise SystemExit("Backup must preserve templates, product favorites and recurrence")

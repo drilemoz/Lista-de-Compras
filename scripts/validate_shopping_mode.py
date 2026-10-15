@@ -51,7 +51,7 @@ for name in ('ShoppingRepository.kt', 'TemplateRepository.kt', 'BackupRepository
     assert 'putShoppingFields(' in source and 'readShoppingFields(' in source, name
     assert 'listType' in source, name
 backup = (code/'data/BackupRepository.kt').read_text()
-assert 'const val SCHEMA_VERSION = 8' in backup
+assert 'const val SCHEMA_VERSION = 9' in backup
 assert '"meu-supermercado-backup"' in backup
 assert 'list.listType.name' in backup and 'item.productUrl' in backup and 'item.installmentAmount' in backup
 assert 'listType = parseListType(' in backup

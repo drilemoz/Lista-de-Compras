@@ -242,7 +242,7 @@ class BackupRepository(
         imported: MutableList<CatalogProduct>,
         schemaVersion: Int
     ): MutableList<CatalogProduct> {
-        if (schemaVersion >= SCHEMA_VERSION) return imported.map { it.copy() }.toMutableList()
+        if (schemaVersion >= 8) return imported.map { it.copy() }.toMutableList()
         val current = catalogRepository.loadProducts().associateBy { ProductCatalogRepository.normalizeName(it.name) }
         return imported.map { incoming ->
             val existing = current[ProductCatalogRepository.normalizeName(incoming.name)]
@@ -493,7 +493,7 @@ class BackupRepository(
     private fun number(value: Double): String = String.format(Locale.ROOT, "%.6f", value).trimEnd('0').trimEnd('.')
     private fun instant(epochMillis: Long): String = runCatching { Instant.ofEpochMilli(epochMillis).toString() }.getOrDefault("")
     companion object {
-        const val SCHEMA_VERSION = 8
+        const val SCHEMA_VERSION = 9
         private const val BACKUP_FORMAT = "lista-de-compras-backup"
         private const val LEGACY_BACKUP_FORMAT = "meu-supermercado-backup"
     }

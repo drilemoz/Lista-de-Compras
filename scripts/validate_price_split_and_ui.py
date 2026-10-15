@@ -32,7 +32,7 @@ for fname in ('ShoppingRepository.kt','TemplateRepository.kt','BackupRepository.
     assert 'put("comboTotalPrice", comboTotalPrice' in contents, fname
     assert 'put("comboUnitCount", comboUnitCount' in contents, fname
     assert 'optDouble("comboTotalPrice"' in contents, fname
-assert 'const val SCHEMA_VERSION = 8' in (source/'data/BackupRepository.kt').read_text()
+assert 'const val SCHEMA_VERSION = 9' in (source/'data/BackupRepository.kt').read_text()
 assert '"combo_total", "combo_unidades"' in (source/'data/BackupRepository.kt').read_text()
 assert 'item.comboTotalPrice = null' in (source/'ui/PurchaseModeActivity.kt').read_text()
 assert 'item.copy(purchasedQuantity = actualQuantity).purchasedSubtotal' in (source/'ui/PurchaseModeAdapter.kt').read_text()
