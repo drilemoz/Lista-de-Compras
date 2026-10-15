@@ -52,10 +52,13 @@
                 android:id="@+id/layoutName" style="@style/Widget.ListaCompras.Field.Outlined"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:hint="Nome do produto"
+                app:boxCollapsedPaddingTop="12dp"
                 app:placeholderText="Ex.: Arroz, café, retrovisor">
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/inputName" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:minHeight="54dp"
+                    android:layout_height="wrap_content" android:minHeight="62dp"
+                    android:paddingTop="10dp" android:paddingBottom="10dp"
+                    android:paddingStart="16dp" android:paddingEnd="16dp"
                     android:inputType="textCapSentences" android:singleLine="true"
                     android:completionThreshold="1" android:imeOptions="actionNext" />
             </com.google.android.material.textfield.TextInputLayout>

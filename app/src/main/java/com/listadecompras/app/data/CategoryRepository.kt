@@ -119,7 +119,7 @@ class CategoryRepository(context: Context) : SQLiteOpenHelper(context.applicatio
 
         private const val DB_NAME = "lista_de_compras_categories.db"
         private const val DB_VERSION = 1
-        val icons = listOf("🛒", "🥕", "🥩", "🥖", "🧀", "🫘", "🥤", "🧊", "🧹", "🧴", "🐾", "💊", "👶", "🏠", "🍎", "☕", "🍰", "🌿", "⚡", "🎁")
+        val icons = listOf("🛒", "🥕", "🥩", "🥖", "🧀", "🫘", "🥤", "🧊", "🧹", "🧴", "🐾", "💊", "👶", "🏠", "🍎", "☕", "🍰", "🌿", "⚡", "🎁", "🚗", "🚲", "💻", "📱", "🔌", "🛠", "🎮", "👕", "👟", "📚", "🎧", "📷", "🧰", "⚽", "🎣", "🧸", "🪑", "🧳", "🧱", "🎨")
         val defaults = listOf(
             PurchaseCategory("Hortifruti", "🥕"), PurchaseCategory("Açougue", "🥩"),
             PurchaseCategory("Padaria", "🥖"), PurchaseCategory("Laticínios", "🧀"),

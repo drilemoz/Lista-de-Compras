@@ -1,4 +1,4 @@
-# Validação 1.0.38+42
+# Validação 1.0.39+43
 
 - Conferir `scripts/validate_price_split_and_ui.py` para o contrato de calculadora, layouts e serializadores.
 - Conferir `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug` e assinatura Release no GitHub Actions.

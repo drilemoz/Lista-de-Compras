@@ -1,11 +1,14 @@
 # Changelog
 
-## 1.0.38+42 (editor, categorias e combos)
+## 1.0.39+43 (ajustes do editor e novos ícones)
 
 - Tela de inclusão/edição de produtos reconstruída com cabeçalho e ação Salvar fixos, contornos discretos e opções secundárias recolhíveis.
 - Seletor de emojis em grade de cinco colunas, com estado visual da seleção e possibilidade de alterar ícone de categoria existente sem modificar seu nome.
 - Calculadora de ofertas: total do combo ÷ quantidade de unidades (2 a 999), exibindo preço por unidade arredondado, mas preservando a precisão para cálculos de subtotal.
 - O total monetário é calculado a partir do valor original da oferta e arredondado apenas no fim, evitando R$ 14,79 virar R$ 14,80 em ofertas de 2 unidades.
+- Campo de nome do produto recebeu `boxCollapsedPaddingTop` e padding interno maior para afastar o texto digitado do rótulo flutuante.
+- Catálogo de ícones de categorias ampliado com tecnologia, carros, bicicleta, ferramentas, roupas, games, escritório e outras áreas.
+- Seletor de ícones agora é rolável para acomodar o conjunto maior sem perder a grade.
 - Metadados `comboTotalPrice`/`comboUnitCount` persistidos em listas, modelos e backup JSON schema 7; leitores aceitam backups anteriores. Exportação CSV inclui as duas colunas.
 - No modo de compra, a edição manual do total substitui os metadados da oferta, para não mostrar valores antigos nos totais.
 - Android continua em `com.listadecompras.app`, preservando dados locais e assinatura (os Secrets de assinatura não foram alterados).

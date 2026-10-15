@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
@@ -60,7 +61,7 @@ object CategoryDialog {
         }
     }
 
-    /** Grade de cinco colunas em vez da antiga lista vertical. */
+    /** Grade rolável de ícones em várias áreas, substituindo a antiga lista vertical. */
     private fun chooseIcon(context: Context, currentIcon: String, onSelected: (String) -> Unit) {
         val density = context.resources.displayMetrics.density
         fun dp(size: Int) = (size * density + .5f).toInt()
@@ -69,11 +70,15 @@ object CategoryDialog {
             setPadding(dp(16), dp(6), dp(16), dp(8))
         }
         val hint = TextView(context).apply {
-            text = "Toque em um símbolo para representar a categoria."
+            text = "Toque em um símbolo para representar a categoria. Há opções para mercado, tecnologia, carro, bicicleta, casa e outros temas."
             setTextColor(MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant))
             setPadding(dp(4), dp(4), dp(4), dp(12))
         }
         root.addView(hint)
+        val scroll = ScrollView(context).apply {
+            isFillViewport = true
+            overScrollMode = ScrollView.OVER_SCROLL_IF_CONTENT_SCROLLS
+        }
         val grid = GridLayout(context).apply {
             columnCount = 5
             alignmentMode = GridLayout.ALIGN_BOUNDS
@@ -83,6 +88,7 @@ object CategoryDialog {
         val outlineColor = MaterialColors.getColor(root, com.google.android.material.R.attr.colorPrimary)
         val buttons = mutableListOf<Pair<String, MaterialButton>>()
         var selected = currentIcon
+        val columns = grid.columnCount
         CategoryRepository.icons.forEachIndexed { index, emoji ->
             val button = MaterialButton(context).apply {
                 text = emoji
@@ -105,14 +111,15 @@ object CategoryDialog {
                     }
                 }
             }
-            val lp = GridLayout.LayoutParams(GridLayout.spec(index / 5), GridLayout.spec(index % 5, 1f)).apply {
+            val lp = GridLayout.LayoutParams(GridLayout.spec(index / columns), GridLayout.spec(index % columns, 1f)).apply {
                 width = 0; height = dp(56)
                 setMargins(dp(3), dp(3), dp(3), dp(3))
             }
             grid.addView(button, lp)
             buttons.add(emoji to button)
         }
-        root.addView(grid, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        scroll.addView(grid, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        root.addView(scroll, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(300)))
         buttons.firstOrNull { it.first == selected }?.second?.performClick()
         MaterialAlertDialogBuilder(context)
             .setTitle("Escolha o ícone")
