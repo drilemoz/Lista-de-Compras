@@ -79,25 +79,122 @@
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:text="LINKS DAS LOJAS" android:textStyle="bold"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/buttonOpenProductUrl"
-                    style="@style/Widget.ListaCompras.Button.Filled" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:layout_marginTop="12dp"
-                    android:text="Abrir anúncio" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/buttonCopyProductUrl"
-                    style="@style/Widget.ListaCompras.Button.Outlined" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:text="Copiar link" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/buttonShareProductUrl"
-                    style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:text="Compartilhar link" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/buttonOpenAlternativeUrl"
-                    style="@style/Widget.ListaCompras.Button.Outlined" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:text="Abrir oferta alternativa" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/buttonCopyAlternativeUrl"
-                    style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:text="Copiar link alternativo" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/buttonShareAlternativeUrl"
-                    style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:text="Compartilhar outra oferta" />
+                <TextView android:id="@+id/textPrimaryLinkTitle"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" android:text="Anúncio principal"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+                <LinearLayout android:id="@+id/rowPrimaryLinks"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <LinearLayout android:id="@+id/buttonOpenProductUrl"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="76dp"
+                        android:padding="8dp" android:orientation="vertical"
+                        android:gravity="center" android:clickable="true"
+                        android:focusable="true" android:background="?attr/selectableItemBackground"
+                        android:contentDescription="Abrir link do produto">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                            android:src="@drawable/ic_link_open" android:importantForAccessibility="no"
+                            app:tint="?attr/colorPrimary" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" android:gravity="center"
+                            android:maxLines="1" android:text="Abrir"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/buttonCopyProductUrl"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="76dp"
+                        android:padding="8dp" android:orientation="vertical"
+                        android:gravity="center" android:clickable="true"
+                        android:focusable="true" android:background="?attr/selectableItemBackground"
+                        android:contentDescription="Copiar link do produto">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                            android:src="@drawable/ic_link_copy" android:importantForAccessibility="no"
+                            app:tint="?attr/colorPrimary" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" android:gravity="center"
+                            android:maxLines="1" android:text="Copiar"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/buttonShareProductUrl"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="76dp"
+                        android:padding="8dp" android:orientation="vertical"
+                        android:gravity="center" android:clickable="true"
+                        android:focusable="true" android:background="?attr/selectableItemBackground"
+                        android:contentDescription="Compartilhar link do produto">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                            android:src="@drawable/ic_link_share" android:importantForAccessibility="no"
+                            app:tint="?attr/colorPrimary" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" android:gravity="center"
+                            android:maxLines="1" android:text="Compartilhar"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                </LinearLayout>
+                <TextView android:id="@+id/textAlternativeLinkTitle"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" android:text="Outra oferta"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+                <LinearLayout android:id="@+id/rowAlternativeLinks"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <LinearLayout android:id="@+id/buttonOpenAlternativeUrl"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="76dp"
+                        android:padding="8dp" android:orientation="vertical"
+                        android:gravity="center" android:clickable="true"
+                        android:focusable="true" android:background="?attr/selectableItemBackground"
+                        android:contentDescription="Abrir oferta alternativa">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                            android:src="@drawable/ic_link_open" android:importantForAccessibility="no"
+                            app:tint="?attr/colorPrimary" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" android:gravity="center"
+                            android:maxLines="1" android:text="Abrir"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/buttonCopyAlternativeUrl"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="76dp"
+                        android:padding="8dp" android:orientation="vertical"
+                        android:gravity="center" android:clickable="true"
+                        android:focusable="true" android:background="?attr/selectableItemBackground"
+                        android:contentDescription="Copiar oferta alternativa">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                            android:src="@drawable/ic_link_copy" android:importantForAccessibility="no"
+                            app:tint="?attr/colorPrimary" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" android:gravity="center"
+                            android:maxLines="1" android:text="Copiar"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/buttonShareAlternativeUrl"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="76dp"
+                        android:padding="8dp" android:orientation="vertical"
+                        android:gravity="center" android:clickable="true"
+                        android:focusable="true" android:background="?attr/selectableItemBackground"
+                        android:contentDescription="Compartilhar oferta alternativa">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                            android:src="@drawable/ic_link_share" android:importantForAccessibility="no"
+                            app:tint="?attr/colorPrimary" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" android:gravity="center"
+                            android:maxLines="1" android:text="Compartilhar"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:textColor="?attr/colorOnSurface" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

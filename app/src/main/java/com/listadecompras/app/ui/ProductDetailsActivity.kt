@@ -148,18 +148,20 @@ class ProductDetailsActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.cardProductLinks).visibility =
             if (shopping && (item.productUrl.isNotBlank() || item.alternativeUrl.isNotBlank())) View.VISIBLE else View.GONE
-        for (id in listOf(R.id.buttonOpenProductUrl, R.id.buttonCopyProductUrl, R.id.buttonShareProductUrl)) {
-            findViewById<View>(id).visibility = if (item.productUrl.isNotBlank()) View.VISIBLE else View.GONE
-        }
-        for (id in listOf(R.id.buttonOpenAlternativeUrl, R.id.buttonCopyAlternativeUrl, R.id.buttonShareAlternativeUrl)) {
-            findViewById<View>(id).visibility = if (item.alternativeUrl.isNotBlank()) View.VISIBLE else View.GONE
-        }
-        findViewById<MaterialButton>(R.id.buttonOpenProductUrl).setOnClickListener { openLink(item.productUrl) }
-        findViewById<MaterialButton>(R.id.buttonOpenAlternativeUrl).setOnClickListener { openLink(item.alternativeUrl) }
-        findViewById<MaterialButton>(R.id.buttonCopyProductUrl).setOnClickListener { copyUrl(item.productUrl) }
-        findViewById<MaterialButton>(R.id.buttonCopyAlternativeUrl).setOnClickListener { copyUrl(item.alternativeUrl) }
-        findViewById<MaterialButton>(R.id.buttonShareProductUrl).setOnClickListener { shareUrl(item.productUrl) }
-        findViewById<MaterialButton>(R.id.buttonShareAlternativeUrl).setOnClickListener { shareUrl(item.alternativeUrl) }
+        findViewById<View>(R.id.rowPrimaryLinks).visibility =
+            if (item.productUrl.isNotBlank()) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.textPrimaryLinkTitle).visibility =
+            if (item.productUrl.isNotBlank()) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.rowAlternativeLinks).visibility =
+            if (item.alternativeUrl.isNotBlank()) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.textAlternativeLinkTitle).visibility =
+            if (item.alternativeUrl.isNotBlank()) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.buttonOpenProductUrl).setOnClickListener { openLink(item.productUrl) }
+        findViewById<View>(R.id.buttonOpenAlternativeUrl).setOnClickListener { openLink(item.alternativeUrl) }
+        findViewById<View>(R.id.buttonCopyProductUrl).setOnClickListener { copyUrl(item.productUrl) }
+        findViewById<View>(R.id.buttonCopyAlternativeUrl).setOnClickListener { copyUrl(item.alternativeUrl) }
+        findViewById<View>(R.id.buttonShareProductUrl).setOnClickListener { shareUrl(item.productUrl) }
+        findViewById<View>(R.id.buttonShareAlternativeUrl).setOnClickListener { shareUrl(item.alternativeUrl) }
     }
 
     private fun copyUrl(link: String) {

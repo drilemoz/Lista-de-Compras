@@ -25,8 +25,10 @@ object ProductImages {
     fun importUri(context: Context, source: Uri): String {
         val resolver = context.contentResolver
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        resolver.openInputStream(source)?.use { BitmapFactory.decodeStream(it, null, bounds) }
-            ?: error("Imagem indisponível")
+        // When inJustDecodeBounds is true, decodeStream returns null by design.
+        // The dimensions in bounds, not the returned Bitmap, determine validity.
+        val previewStream = resolver.openInputStream(source) ?: error("Imagem indisponível")
+        previewStream.use { BitmapFactory.decodeStream(it, null, bounds) }
         require(bounds.outWidth in 1..16000 && bounds.outHeight in 1..16000) { "Dimensões de imagem inválidas." }
         var sample = 1
         while (bounds.outWidth / sample > 1400 || bounds.outHeight / sample > 1400) sample *= 2

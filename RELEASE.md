@@ -1,10 +1,8 @@
-# Lista de Compras 1.0.44+48
+# Lista de Compras 1.0.45+49
 
-- Tela de detalhes do produto (somente visualização), acessível ao tocar em qualquer card.
-- Foto opcional por galeria/câmera; miniatura na lista e edição/remoção direta.
-- Links da loja mais acessíveis: abrir, copiar e compartilhar. Oferta alternativa também abre em navegador.
-- Parcelamento e comparação nos detalhes, com aviso claro sobre acréscimo total acima de 50%.
-- Backup em ZIP com JSON schema 9 e JPEGs; leitura de JSON legado preservada.
-- Dados, IDs de itens, fórmulas financeiras e assinatura Android mantidos.
+- Corrigido erro **Imagem indisponível** ao selecionar foto na galeria e ao capturar pela câmera: leitura inicial de dimensões não é mais confundida com imagem inválida.
+- Tela de detalhes: ações **Abrir, Copiar e Compartilhar** passam a formar uma única linha com ícones, inclusive para outra oferta cadastrada.
+- Mesmas fotos JPEG otimizadas e ZIP de backup schema 9, sem migração nem exclusão de dados.
+- Teste de regressão de imagem/links adicionado ao workflow.
 
-**A validar:** `:app:testDebugUnitTest`, `:app:assembleDebug`, `:app:lintDebug`, seleção de mídia e teste de exportação/restauração no aparelho.
+**Pendente:** confirmar compilação Android e Lint no GitHub Actions e testar galeria/câmera em um aparelho.

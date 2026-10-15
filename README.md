@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.44+48`
+`1.0.45+49`
 
 ## Identidade técnica
 
@@ -17,6 +17,14 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.45+49 (foto e atalhos de links corrigidos)
+
+- Corrigida a mensagem incorreta **Imagem indisponível** ao escolher foto da galeria ou tirar foto com a câmera. O primeiro passo de `BitmapFactory.decodeStream` consulta apenas as dimensões e retorna `null` intencionalmente; o importador agora verifica a existência do fluxo e as dimensões obtidas, sem interpretar o `null` como erro.
+- Os três comandos do anúncio (**Abrir, Copiar, Compartilhar**) agora aparecem lado a lado, com ícones e áreas de toque claras. A oferta alternativa também segue o mesmo layout, apenas quando houver seu link cadastrado.
+- Arquivos de backup JSON/ZIP schema 9, fotos existentes, cálculos e dados locais permanecem compatíveis; não é necessário limpar dados do aplicativo ou reinstalar do zero.
+- Validador preventivo incluído para garantir que a leitura de dimensões não volte a ser tratada como falha e que os atalhos permaneçam alinhados.
+- Testes estruturais locais aprovados; compilação Android e comportamento no aparelho dependem de validação no GitHub Actions.
 
 ## Atualização 1.0.44+48 (detalhes e fotos de produtos)
 

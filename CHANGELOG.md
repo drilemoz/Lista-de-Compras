@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.45+49 (importação de foto e atalhos de links)
+
+- Corrigido o importador de imagens: `BitmapFactory.decodeStream` em `inJustDecodeBounds=true` sempre retorna bitmap nulo; a verificação foi alterada para validar o `InputStream` aberto e as dimensões em `BitmapFactory.Options`.
+- Seleção por galeria e câmera agora usam a mesma rotina corrigida, sem modificar nome dos arquivos JPEG, otimização ou backup.
+- Seção de links no detalhamento do produto redesenhada em uma única linha de ações com ícones e legendas, para anúncio principal e oferta alternativa.
+- Mantidos ids de ações e contratos dos links, com tratamento independente quando uma das ofertas não possui endereço.
+- Introduzido teste de regressão em `scripts/validate_photo_link_fix.py`, executado no workflow.
+- Schema 9, backups existentes, dados locais, assinatura Android e package `com.listadecompras.app` preservados.
+- Compilação Android, Lint e verificação visual física ainda pendentes.
+
 ## 1.0.44+48 (detalhes, fotos e backup ZIP)
 
 - Nova `ProductDetailsActivity` somente leitura ao tocar no card, com ação explícita para editar e exibição de valores, notas, parcelas, vencimentos e comparação.

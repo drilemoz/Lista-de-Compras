@@ -11,8 +11,8 @@ android {
         applicationId = "com.listadecompras.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 48
-        versionName = "1.0.44"
+        versionCode = 49
+        versionName = "1.0.45"
     }
 
     buildFeatures {
