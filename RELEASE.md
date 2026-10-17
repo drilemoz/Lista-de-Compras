@@ -1,8 +1,10 @@
-# Lista de Compras 1.0.45+49
+# Lista de Compras 1.0.46+50
 
-- Corrigido erro **Imagem indisponível** ao selecionar foto na galeria e ao capturar pela câmera: leitura inicial de dimensões não é mais confundida com imagem inválida.
-- Tela de detalhes: ações **Abrir, Copiar e Compartilhar** passam a formar uma única linha com ícones, inclusive para outra oferta cadastrada.
-- Mesmas fotos JPEG otimizadas e ZIP de backup schema 9, sem migração nem exclusão de dados.
-- Teste de regressão de imagem/links adicionado ao workflow.
+- Orçamento mais compacto e editável tocando diretamente no cartão. Acesso antigo pelo botão de texto foi substituído por ícone, sem criar etapas extras.
+- Filtros Todos, Pendentes e Comprados visualmente reduzidos, mas com área de toque de 48dp e aplicação direta.
+- Cartões de produtos com menos altura e espaçamento, mantendo as fotos e os controles acessíveis.
+- Em compras à vista sem parcelamento, removida a indicação redundante "sem parcelas".
+- "🔗 Link salvo" agora aparece na mesma linha da categoria, apenas quando existir o anúncio.
+- Nenhuma mudança nos valores armazenados, links, fotos, formato de backup ZIP schema 9 ou assinatura.
 
-**Pendente:** confirmar compilação Android e Lint no GitHub Actions e testar galeria/câmera em um aparelho.
+**Validação pendente:** compilar/testar o APK em GitHub Actions e conferir a aparência e o toque em aparelho Android.

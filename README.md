@@ -4,7 +4,7 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 
 ## Versão
 
-`1.0.45+49`
+`1.0.46+50`
 
 ## Identidade técnica
 
@@ -17,6 +17,15 @@ Aplicativo Android nativo, leve e offline para organizar compras em listas separ
 - Kotlin: 2.0.21; Java/JVM: 17; Android Gradle Plugin: 8.7.3
 - UI: Material 3 com XML e BottomSheetDialog
 - **IMPORTANTE:** a troca do applicationId cria um aplicativo novo. O Android não transfere dados do antigo automaticamente. Faça backup JSON pelo app antigo antes de desinstalar e importe na nova instalação. Os dois apps podem coexistir.
+
+## Atualização 1.0.46+50 (lista compacta e orçamento de um toque)
+
+- Cartão **Seu orçamento** mais compacto e clicável por inteiro; o botão de texto **Definir/Alterar** foi substituído por ícone de lápis. Um toque em qualquer área do cartão abre a configuração de orçamento.
+- Filtros **Todos / Pendentes / Comprados** com visual mais baixo (contornos com inset de 3dp), mantendo a área de toque de 48dp e a filtragem em um único toque.
+- Cartões de produtos ligeiramente mais compactos: menor espaçamento vertical, miniaturas de 48dp, checkbox e ações com área de toque preservada.
+- Compras à vista deixam de exibir o texto redundante **sem parcelas**; parcelamentos reais permanecem visíveis.
+- O aviso **🔗 Link salvo** aparece na mesma linha da categoria para produtos Shopping que possuam URL, sem repetir o aviso nas observações.
+- Sem alteração de dados, categoria, assinatura ou backup ZIP schema 9. A compilação Android completa continua pendente do CI.
 
 ## Atualização 1.0.45+49 (foto e atalhos de links corrigidos)
 

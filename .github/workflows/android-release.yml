@@ -61,6 +61,7 @@ jobs:
           python3 scripts/validate_shopping_mode.py
           python3 scripts/validate_product_details_photos.py
           python3 scripts/validate_photo_link_fix.py
+          python3 scripts/validate_list_compact.py
           python3 scripts/validate_source.py
           python3 scripts/validate_workflow.py
           python3 scripts/validate_repaginacao.py

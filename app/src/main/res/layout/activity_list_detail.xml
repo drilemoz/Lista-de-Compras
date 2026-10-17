@@ -91,15 +91,20 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardListBudget"
             style="@style/Widget.ListaCompras.Card.Highlight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="6dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:contentDescription="Editar orçamento">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="11dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -114,21 +119,18 @@
                         android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
                         android:textColor="?attr/colorOnPrimaryContainer"
                         android:textStyle="bold" />
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buttonBudget"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:minHeight="40dp"
-                        android:text="Definir"
-                        android:textColor="?attr/colorOnPrimaryContainer" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:padding="7dp"
+                        android:src="@drawable/ic_edit"
+                        android:importantForAccessibility="no"
+                        app:tint="?attr/colorOnPrimaryContainer" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="4dp"
                     android:orientation="horizontal">
                     <LinearLayout
                         android:layout_width="0dp"
@@ -200,7 +202,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
                     <TextView
@@ -224,7 +226,7 @@
                     android:id="@+id/progressBudget"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="4dp"
                     android:max="100"
                     android:visibility="gone"
                     app:indicatorColor="?attr/colorOnPrimaryContainer"
@@ -298,8 +300,8 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
+                android:insetTop="3dp"
+                android:insetBottom="3dp"
                 android:text="Todos" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonPending"
@@ -307,8 +309,8 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
+                android:insetTop="3dp"
+                android:insetBottom="3dp"
                 android:text="Pendentes" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonPurchased"
@@ -316,8 +318,8 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
+                android:insetTop="3dp"
+                android:insetBottom="3dp"
                 android:text="Comprados" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
         <FrameLayout

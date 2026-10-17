@@ -62,6 +62,7 @@ class ShoppingItemAdapter(
         private val meta: TextView = view.findViewById(R.id.textMeta)
         private val note: TextView = view.findViewById(R.id.textNote)
         private val categoryChip: TextView = view.findViewById(R.id.textCategoryChip)
+        private val savedLink: TextView = view.findViewById(R.id.textSavedLink)
         private val priceTargetStatus: TextView = view.findViewById(R.id.textPriceTargetStatus)
         private val unitPrice: TextView = view.findViewById(R.id.textUnitPrice)
         private val totalPrice: TextView = view.findViewById(R.id.textPrice)
@@ -81,6 +82,11 @@ class ShoppingItemAdapter(
                 "${quantityFormat.format(item.quantity)} ${item.unit} planejados"
             }
             categoryChip.text = CategoryRepository.label(itemView.context, item.category)
+            val showLink = isShopping && item.productUrl.isNotBlank()
+            savedLink.visibility = if (showLink) View.VISIBLE else View.GONE
+            categoryChip.maxWidth = if (showLink) {
+                (124 * itemView.resources.displayMetrics.density + 0.5f).toInt()
+            } else Int.MAX_VALUE
             check.contentDescription = if (item.purchased) {
                 "Marcar ${item.name} como pendente"
             } else {
@@ -92,7 +98,11 @@ class ShoppingItemAdapter(
                     if (item.purchased) item.shopPurchasedSubtotal else item.shopFinancedSubtotal
                 } else if (item.purchased) item.purchasedSubtotal else item.subtotal)
                 unitPrice.text = if (isShopping) {
-                    "À vista ${currency.format(item.unitPrice)} • ${item.installmentCount.takeIf { it > 0 }?.let { "$it × ${currency.format(item.installmentAmount)}" } ?: "sem parcelas"}"
+                    if (item.installmentCount > 0 && item.installmentAmount > 0.0) {
+                        "À vista ${currency.format(item.unitPrice)} • ${item.installmentCount} × ${currency.format(item.installmentAmount)}"
+                    } else {
+                        "À vista ${currency.format(item.unitPrice)}"
+                    }
                 } else PriceUnitHelper.formattedUnitPrice(item, currency)
             } else {
                 totalPrice.text = "Sem preço"
@@ -107,8 +117,7 @@ class ShoppingItemAdapter(
                 item.storeName.takeIf { it.isNotBlank() },
                 item.variant.takeIf { it.isNotBlank() },
                 item.note.takeIf { it.isNotBlank() },
-                item.shopCalculation?.takeIf { it.extraPercent > 50 }?.let { "⚠ Acréscimo total acima de 50%" },
-                item.productUrl.takeIf { it.isNotBlank() }?.let { "🔗 Link salvo" }
+                item.shopCalculation?.takeIf { it.extraPercent > 50 }?.let { "⚠ Acréscimo total acima de 50%" }
             ).joinToString(" • ") else item.note
             note.visibility = if (note.text.isBlank()) View.GONE else View.VISIBLE
 

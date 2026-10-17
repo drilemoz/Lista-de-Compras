@@ -53,7 +53,7 @@ class ListDetailActivity : AppCompatActivity() {
     private lateinit var budgetStatus: TextView
     private lateinit var budgetRemainingLabel: TextView
     private lateinit var budgetRemaining: TextView
-    private lateinit var budgetButton: MaterialButton
+    private lateinit var budgetCard: View
     private lateinit var budgetProgress: LinearProgressIndicator
     private var filter = Filter.ALL
     private val currency = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
@@ -154,7 +154,7 @@ class ListDetailActivity : AppCompatActivity() {
         budgetStatus = findViewById(R.id.textBudgetStatus)
         budgetRemainingLabel = findViewById(R.id.textBudgetRemainingLabel)
         budgetRemaining = findViewById(R.id.textBudgetRemaining)
-        budgetButton = findViewById(R.id.buttonBudget)
+        budgetCard = findViewById(R.id.cardListBudget)
         budgetProgress = findViewById(R.id.progressBudget)
         val recycler = findViewById<RecyclerView>(R.id.recyclerItems)
 
@@ -191,7 +191,7 @@ class ListDetailActivity : AppCompatActivity() {
             setOnClickListener { openRecurringProducts() }
         }
         clearPurchased.setOnClickListener { clearPurchased() }
-        budgetButton.setOnClickListener { editBudget() }
+        budgetCard.setOnClickListener { editBudget() }
 
         search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
@@ -457,7 +457,7 @@ class ListDetailActivity : AppCompatActivity() {
 
         if (current.budget <= 0.0) {
             budgetStatus.text = "Sem orçamento definido"
-            budgetButton.text = "Definir"
+            budgetCard.contentDescription = "Toque para definir orçamento"
             budgetRemainingLabel.text = "Orçamento"
             budgetRemaining.text = "—"
             budgetRemainingLabel.setTextColor(normalColor)
@@ -468,7 +468,7 @@ class ListDetailActivity : AppCompatActivity() {
 
         val remaining = current.budgetRemaining
         budgetStatus.text = "Orçamento ${currency.format(current.budget)}"
-        budgetButton.text = "Alterar"
+        budgetCard.contentDescription = "Toque para alterar orçamento"
         budgetRemainingLabel.text = if (remaining >= 0.0) "Falta" else "Excedeu"
         budgetRemaining.text = currency.format(kotlin.math.abs(remaining))
         val remainingColor = if (remaining >= 0.0) normalColor else errorColor

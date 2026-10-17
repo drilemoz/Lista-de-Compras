@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.46+50 (refinamentos de cartões, filtros e links)
+
+- Ajustada a altura visual do cartão de orçamento, com acesso ao editor por um toque em qualquer área, substituindo o CTA textual por um ícone de lápis.
+- Filtros Todos/Pendentes/Comprados ganharam contorno com inset visual de 3dp sem perder 48dp de área de toque e continuam aplicando filtro diretamente.
+- Cartões de produtos compactados com redução leve de padding vertical, margens e miniaturas de 48dp.
+- Removida a mensagem **sem parcelas** do modo Shopping quando não houver parcelamento configurado; exibição de parcelas existente preservada.
+- Selo **Link salvo** movido das observações para a mesma linha da categoria, com ocultação quando não houver URL e limite de largura para nomes longos.
+- Adicionado teste de regressão `scripts/validate_list_compact.py` ao workflow.
+- Metadados e tela de Novidades atualizados para 1.0.46+50; backup schema 9, aplicativo e Secrets não alterados.
+
 ## 1.0.45+49 (importação de foto e atalhos de links)
 
 - Corrigido o importador de imagens: `BitmapFactory.decodeStream` em `inJustDecodeBounds=true` sempre retorna bitmap nulo; a verificação foi alterada para validar o `InputStream` aberto e as dimensões em `BitmapFactory.Options`.
